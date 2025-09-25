@@ -18,7 +18,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
-  // Motivational messages that change based on time or randomly
+  // Motivational messages for different times of day
   const motivationalMessages = [
     "Ayo update progres kamu! 🚀",
     "Waktunya tracking karier impian! ✨",
@@ -32,10 +32,13 @@ export default function LoginPage() {
 
   const getMotivationalMessage = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning! Ayo mulai hari dengan semangat! ☀️";
-    if (hour < 17) return "Good afternoon! Tetap semangat kejar impian! 🌤️";
-    if (hour < 21) return "Good evening! Jangan menyerah, terus berjuang! 🌅";
-    return "Good night! Besok adalah hari baru penuh peluang! 🌙";
+    const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+    
+    // Return time-based message with random motivational message
+    if (hour < 12) return `Good morning! ${randomMessage} ☀️`;
+    if (hour < 17) return `Good afternoon! ${randomMessage} 🌤️`;
+    if (hour < 21) return `Good evening! ${randomMessage} 🌅`;
+    return `Good night! ${randomMessage} 🌙`;
   };
 
   const {
