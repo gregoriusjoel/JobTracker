@@ -39,15 +39,25 @@ export default function TestPage() {
         setResult(prev => prev + `\n✅ Login test: Success!`);
         setResult(prev => prev + `\n   Token: ${loginResponse.data.token ? 'Received' : 'Missing'}`);
         setResult(prev => prev + `\n   User: ${JSON.stringify(loginResponse.data.user, null, 2)}`);
-      } catch (loginError: any) {
-        setResult(prev => prev + `\n❌ Login test failed: ${loginError.message}`);
-        if (loginError.response) {
-          setResult(prev => prev + `\n   Status: ${loginError.response.status}`);
-          setResult(prev => prev + `\n   Error: ${loginError.response.data?.error || 'Unknown error'}`);
-          setResult(prev => prev + `\n   Headers: ${JSON.stringify(loginError.response.headers, null, 2)}`);
-        } else if (loginError.request) {
-          setResult(prev => prev + `\n   Network Error: ${loginError.code || 'UNKNOWN'}`);
-          setResult(prev => prev + `\n   Message: ${loginError.message}`);
+      } catch (loginError) {
+        const err = loginError as {
+          message?: string;
+          response?: {
+            status?: number;
+            data?: { error?: string };
+            headers?: Record<string, unknown>;
+          };
+          request?: unknown;
+          code?: string;
+        };
+        setResult(prev => prev + `\n❌ Login test failed: ${err.message || 'Unknown error'}`);
+        if (err.response) {
+          setResult(prev => prev + `\n   Status: ${err.response.status || 'Unknown'}`);
+          setResult(prev => prev + `\n   Error: ${err.response.data?.error || 'Unknown error'}`);
+          setResult(prev => prev + `\n   Headers: ${JSON.stringify(err.response.headers || {}, null, 2)}`);
+        } else if (err.request) {
+          setResult(prev => prev + `\n   Network Error: ${err.code || 'UNKNOWN'}`);
+          setResult(prev => prev + `\n   Message: ${err.message || 'Unknown error'}`);
         }
       }
       

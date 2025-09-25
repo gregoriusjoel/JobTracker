@@ -60,7 +60,8 @@ function ResetPasswordContent() {
       }, 3000);
     } catch (error) {
       console.error('Reset password error:', error);
-      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to reset password';
+      const err = error as { response?: { data?: { error?: string } } };
+      const errorMessage = err?.response?.data?.error || 'Failed to reset password';
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

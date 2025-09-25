@@ -83,7 +83,8 @@ export const UserModal: React.FC<UserModalProps> = ({
       onClose();
       reset();
     } catch (error) {
-      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Terjadi kesalahan';
+      const err = error as { response?: { data?: { error?: string } } };
+      const errorMessage = err?.response?.data?.error || 'Terjadi kesalahan';
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
