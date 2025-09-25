@@ -75,15 +75,17 @@ export default function TestPage() {
           setResult(prev => prev + `\n❌ Fetch login test failed: ${fetchLoginResponse.status} ${fetchLoginResponse.statusText}`);
           setResult(prev => prev + `\n   Response: ${errorData}`);
         }
-      } catch (fetchError: any) {
-        setResult(prev => prev + `\n❌ Fetch login test failed: ${fetchError.message}`);
+      } catch (fetchError) {
+        const fetchErr = fetchError as { message?: string };
+        setResult(prev => prev + `\n❌ Fetch login test failed: ${fetchErr.message || 'Unknown error'}`);
       }
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('API Test Error:', error);
-      setResult(prev => prev + `\n❌ API Test failed: ${error.message}`);
+      const err = error as { message?: string; code?: string };
+      setResult(prev => prev + `\n❌ API Test failed: ${err.message || 'Unknown error'}`);
       
-      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+      if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK') {
         setResult(prev => prev + '\n❌ Cannot connect to backend server at localhost:8080');
         setResult(prev => prev + '\n💡 Make sure backend is running with: go run .');
       }
@@ -110,8 +112,9 @@ export default function TestPage() {
       } else {
         setResult(prev => prev + `\n❌ CORS test failed: ${response.status} ${response.statusText}`);
       }
-    } catch (error: any) {
-      setResult(prev => prev + `\n❌ CORS test failed: ${error.message}`);
+    } catch (error) {
+      const err = error as { message?: string };
+      setResult(prev => prev + `\n❌ CORS test failed: ${err.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

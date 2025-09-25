@@ -94,8 +94,9 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
       onSuccess();
       onClose();
       reset();
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Terjadi kesalahan');
+    } catch (error) {
+      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Terjadi kesalahan';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

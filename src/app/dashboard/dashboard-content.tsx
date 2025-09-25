@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { 
   Plus, 
   Search, 
-  Filter, 
   Edit, 
   Trash2, 
   Building2, 
@@ -140,7 +139,7 @@ export default function DashboardContent() {
     try {
       const data = await jobApplicationService.getAll();
       setJobApplications(data || []);
-    } catch (error) {
+    } catch {
       toast.error('Gagal memuat data aplikasi pekerjaan');
     } finally {
       setLoading(false);
@@ -152,7 +151,7 @@ export default function DashboardContent() {
       setStatsLoading(true);
       const data = await jobApplicationService.getStats();
       setStats(data);
-    } catch (error) {
+    } catch {
       console.error('Gagal memuat statistik');
     } finally {
       setStatsLoading(false);
@@ -166,7 +165,7 @@ export default function DashboardContent() {
         toast.success('Aplikasi berhasil dihapus');
         fetchJobApplications();
         fetchStats();
-      } catch (error) {
+      } catch {
         toast.error('Gagal menghapus aplikasi');
       }
     }

@@ -61,28 +61,38 @@ export default function LoginPage() {
       setDebugInfo('Redirect ke dashboard...');
       
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       
-      if (error.response) {
+      const err = error as {
+        response?: {
+          data?: { error?: string };
+          status?: number;
+        };
+        request?: unknown;
+        code?: string;
+        message?: string;
+      };
+      
+      if (err.response) {
         // Server responded with error status
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-        const errorMessage = error.response.data?.error || `Server error: ${error.response.status}`;
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
+        const errorMessage = err.response.data?.error || `Server error: ${err.response.status}`;
         setDebugInfo(`❌ ${errorMessage}`);
         toast.error(errorMessage);
-      } else if (error.request) {
+      } else if (err.request) {
         // Request was made but no response received
-        console.error('Request error:', error.request);
+        console.error('Request error:', err.request);
         setDebugInfo('❌ Tidak dapat terhubung ke server. Pastikan backend berjalan di http://localhost:8080');
         toast.error('Tidak dapat terhubung ke server');
-      } else if (error.code === 'ERR_NETWORK') {
+      } else if (err.code === 'ERR_NETWORK') {
         // Network error
         setDebugInfo('❌ Network error - Check if backend is running and CORS is configured');
         toast.error('Network error - Cannot reach server');
       } else {
         // Other error
-        setDebugInfo(`❌ Error: ${error.message}`);
+        setDebugInfo(`❌ Error: ${err.message || 'Unknown error'}`);
         toast.error('Terjadi kesalahan saat login');
       }
     } finally {

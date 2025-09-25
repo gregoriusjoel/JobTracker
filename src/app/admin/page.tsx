@@ -39,7 +39,7 @@ export default function AdminPage() {
     try {
       const data = await userService.getAll();
       setUsers(data || []);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load users');
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ export default function AdminPage() {
         await userService.delete(id);
         toast.success('User deleted successfully');
         fetchUsers();
-      } catch (error) {
+      } catch {
         toast.error('Failed to delete user');
       }
     }

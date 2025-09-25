@@ -30,9 +30,10 @@ export default function ForgotPasswordPage() {
       await api.post('/forgot-password', data);
       setEmailSent(true);
       toast.success('Reset email sent! Check your inbox.');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Forgot password error:', error);
-      toast.error(error.response?.data?.error || 'Failed to send reset email');
+      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to send reset email';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

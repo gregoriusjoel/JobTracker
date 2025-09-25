@@ -58,9 +58,10 @@ function ResetPasswordContent() {
       setTimeout(() => {
         router.push('/login');
       }, 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Reset password error:', error);
-      toast.error(error.response?.data?.error || 'Failed to reset password');
+      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to reset password';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
