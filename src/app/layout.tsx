@@ -12,6 +12,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Job Tracker - Kelola Aplikasi Pekerjaan Anda",
   description: "Aplikasi untuk melacak dan mengelola aplikasi pekerjaan Anda dengan mudah",
+  icons: {
+    icon: '/JT.png',
+    shortcut: '/JT.png',
+    apple: '/JT.png',
+  },
 };
 
 export default function RootLayout({

@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Briefcase, User, LogOut, Menu, X, Settings } from 'lucide-react';
+import { User, LogOut, Menu, X, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export const Header: React.FC = () => {
@@ -27,8 +28,14 @@ export const Header: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               className="flex items-center space-x-3"
             >
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-2">
-                <Briefcase className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-1">
+                <Image 
+                  src="/JT.png" 
+                  alt="Job Tracker Logo" 
+                  width={32} 
+                  height={32}
+                  className="rounded-lg"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Job Tracker</h1>
