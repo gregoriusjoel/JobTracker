@@ -9,6 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
   loading: boolean;
 }
 
@@ -58,6 +59,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUser = (userData: User) => {
+    if (mounted) {
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    }
+  };
+
   // Don't render until mounted to avoid hydration mismatch
   if (!mounted) {
     return null;
@@ -68,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: !!user,
     login,
     logout,
+    updateUser,
     loading
   };
 

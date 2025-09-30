@@ -87,7 +87,7 @@ export default function LoginPage() {
       } else if (err.request) {
         // Request was made but no response received
         console.error('Request error:', err.request);
-        setDebugInfo('❌ Tidak dapat terhubung ke server. Pastikan backend berjalan di http://localhost:8080');
+        setDebugInfo(`❌ Tidak dapat terhubung ke server. Pastikan backend berjalan di ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}`);
         toast.error('Tidak dapat terhubung ke server');
       } else if (err.code === 'ERR_NETWORK') {
         // Network error

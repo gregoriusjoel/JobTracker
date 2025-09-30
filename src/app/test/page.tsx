@@ -7,6 +7,8 @@ export default function TestPage() {
   const [result, setResult] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
   const testAPI = async () => {
     setLoading(true);
     setResult('Testing API connection...');
@@ -14,7 +16,7 @@ export default function TestPage() {
     try {
       // Test health endpoint without /api prefix using fetch
       setResult(prev => prev + '\n📡 Testing health endpoint...');
-      const healthResponse = await fetch('http://localhost:8080/health', {
+      const healthResponse = await fetch(`${API_URL}/health`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +67,7 @@ export default function TestPage() {
       // Test with fetch directly to /api/login
       setResult(prev => prev + '\n📡 Testing login endpoint with fetch...');
       try {
-        const fetchLoginResponse = await fetch('http://localhost:8080/api/login', {
+        const fetchLoginResponse = await fetch(`${API_URL}/api/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -97,7 +99,7 @@ export default function TestPage() {
       setResult(prev => prev + `\n❌ API Test failed: ${err.message || 'Unknown error'}`);
       
       if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK') {
-        setResult(prev => prev + '\n❌ Cannot connect to backend server at localhost:8080');
+        setResult(prev => prev + `\n❌ Cannot connect to backend server at ${API_URL}`);
         setResult(prev => prev + '\n💡 Make sure backend is running with: go run .');
       }
     } finally {
@@ -110,7 +112,7 @@ export default function TestPage() {
     setResult('Testing CORS...');
     
     try {
-      const response = await fetch('http://localhost:8080/health', {
+      const response = await fetch(`${API_URL}/health`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +172,7 @@ export default function TestPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Environment Info</h2>
           <ul className="space-y-2 text-sm">
-            <li><strong>API URL:</strong> {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}</li>
+            <li><strong>API URL:</strong> {API_URL}</li>
             <li><strong>Node ENV:</strong> {process.env.NODE_ENV}</li>
             <li><strong>Browser:</strong> {typeof window !== 'undefined' ? 'Client-side' : 'Server-side'}</li>
           </ul>
