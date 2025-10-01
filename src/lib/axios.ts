@@ -6,6 +6,7 @@ export const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true', // Skip ngrok warning page
   },
   withCredentials: false, // Changed from true to false to avoid CORS preflight issues
   timeout: 10000, // Add timeout
@@ -14,6 +15,9 @@ export const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    // Ensure ngrok header is always present
+    config.headers['ngrok-skip-browser-warning'] = 'true';
+    
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
