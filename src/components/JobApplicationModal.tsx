@@ -20,6 +20,7 @@ type FormData = {
   position: string;
   status: 'applied' | 'interview' | 'rejected' | 'accepted';
   application_date: string;
+  application_platform: string;
   notes: string;
   contact_person: string;
   contact_email: string;
@@ -52,6 +53,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
         setValue('position', jobApplication.position);
         setValue('status', jobApplication.status);
         setValue('application_date', new Date(jobApplication.application_date).toISOString().split('T')[0]);
+        setValue('application_platform', jobApplication.application_platform || '');
         setValue('notes', jobApplication.notes || '');
         setValue('contact_person', jobApplication.contact_person || '');
         setValue('contact_email', jobApplication.contact_email || '');
@@ -64,6 +66,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
           position: '',
           status: 'applied',
           application_date: new Date().toISOString().split('T')[0],
+          application_platform: '',
           notes: '',
           contact_person: '',
           contact_email: '',
@@ -114,7 +117,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           onClick={handleClose}
         >
           <motion.div
@@ -205,6 +208,31 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                     <p className="mt-1 text-sm text-red-600">{errors.application_date.message}</p>
                   )}
                 </div>
+              </div>
+
+              {/* Platform Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Building2 size={16} className="inline mr-2" />
+                  Platform Aplikasi
+                </label>
+                <select
+                  {...register('application_platform')}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
+                >
+                  <option value="">Pilih Platform</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="JobStreet">JobStreet</option>
+                  <option value="Indeed">Indeed</option>
+                  <option value="Glints">Glints</option>
+                  <option value="Kalibrr">Kalibrr</option>
+                  <option value="TopKarir">TopKarir</option>
+                  <option value="JobsDB">JobsDB</option>
+                  <option value="Company Website">Company Website</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Walk-in">Walk-in</option>
+                  <option value="Other">Lainnya</option>
+                </select>
               </div>
 
               {/* Location and Salary */}

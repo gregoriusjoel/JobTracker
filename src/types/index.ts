@@ -15,6 +15,7 @@ export interface JobApplication {
   position: string;
   status: 'applied' | 'interview' | 'rejected' | 'accepted';
   application_date: string;
+  application_platform?: string;
   notes?: string;
   contact_person?: string;
   contact_email?: string;
@@ -29,6 +30,7 @@ export interface CreateJobApplicationRequest {
   position: string;
   status?: 'applied' | 'interview' | 'rejected' | 'accepted';
   application_date: string;
+  application_platform?: string;
   notes?: string;
   contact_person?: string;
   contact_email?: string;
@@ -41,6 +43,7 @@ export interface UpdateJobApplicationRequest {
   position?: string;
   status?: 'applied' | 'interview' | 'rejected' | 'accepted';
   application_date?: string;
+  application_platform?: string;
   notes?: string;
   contact_person?: string;
   contact_email?: string;

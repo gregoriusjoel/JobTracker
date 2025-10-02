@@ -16,7 +16,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Globe
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { JobApplication, JobApplicationStats } from '@/types';
@@ -367,6 +368,9 @@ export default function DashboardContent() {
                       Lokasi
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Platform
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Salary
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -405,6 +409,12 @@ export default function DashboardContent() {
                         <div className="flex items-center text-sm text-gray-900">
                           <MapPin size={16} className="text-gray-400 mr-2" />
                           {app.location || '-'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <Globe size={16} className="text-gray-400 mr-2" />
+                          {app.application_platform || '-'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
