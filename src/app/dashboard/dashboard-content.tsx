@@ -93,12 +93,27 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
     switch (status) {
       case 'applied':
         return { color: 'bg-blue-100 text-blue-800', icon: Clock, label: 'Applied' };
-      case 'interview':
-        return { color: 'bg-yellow-100 text-yellow-800', icon: AlertCircle, label: 'Interview' };
+      case 'screening':
+        return { color: 'bg-purple-100 text-purple-800', icon: Users, label: 'Screening' };
+      case 'test':
+        return { color: 'bg-orange-100 text-orange-800', icon: AlertCircle, label: 'Test/Assessment' };
+      case 'interview_user':
+        return { color: 'bg-yellow-100 text-yellow-800', icon: Users, label: 'Interview - Team' };
+      case 'interview_hr':
+        return { color: 'bg-amber-100 text-amber-800', icon: Users, label: 'Interview - HR' };
+      case 'interview_final':
+        return { color: 'bg-indigo-100 text-indigo-800', icon: Users, label: 'Interview - Final' };
+      case 'offered':
+        return { color: 'bg-emerald-100 text-emerald-800', icon: CheckCircle, label: 'Offered' };
       case 'accepted':
         return { color: 'bg-green-100 text-green-800', icon: CheckCircle, label: 'Accepted' };
       case 'rejected':
         return { color: 'bg-red-100 text-red-800', icon: XCircle, label: 'Rejected' };
+      case 'withdrawn':
+        return { color: 'bg-gray-100 text-gray-800', icon: XCircle, label: 'Withdrawn' };
+      // Legacy support
+      case 'interview':
+        return { color: 'bg-yellow-100 text-yellow-800', icon: Users, label: 'Interview' };
       default:
         return { color: 'bg-gray-100 text-gray-800', icon: Clock, label: status };
     }
@@ -120,9 +135,15 @@ export default function DashboardContent() {
   const [stats, setStats] = useState<JobApplicationStats>({
     total: 0,
     applied: 0,
-    interview: 0,
+    screening: 0,
+    test: 0,
+    interview_user: 0,
+    interview_hr: 0,
+    interview_final: 0,
+    offered: 0,
+    accepted: 0,
     rejected: 0,
-    accepted: 0
+    withdrawn: 0
   });
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -273,12 +294,12 @@ export default function DashboardContent() {
           />
           <StatsCard
             title="Interview"
-            value={stats.interview}
+            value={stats.screening + stats.test + stats.interview_user + stats.interview_hr + stats.interview_final}
             icon={<Users size={24} />}
             color="text-orange-600"
             bgColor="bg-orange-50"
             loading={statsLoading}
-            percentage={calculatePercentage(stats.interview, stats.total)}
+            percentage={calculatePercentage(stats.screening + stats.test + stats.interview_user + stats.interview_hr + stats.interview_final, stats.total)}
           />
           <StatsCard
             title="Rejected"
@@ -323,9 +344,15 @@ export default function DashboardContent() {
               >
                 <option value="">Semua Status</option>
                 <option value="applied">Applied</option>
-                <option value="interview">Interview</option>
+                <option value="screening">Screening</option>
+                <option value="test">Test/Assessment</option>
+                <option value="interview_user">Interview - Team</option>
+                <option value="interview_hr">Interview - HR</option>
+                <option value="interview_final">Interview - Final</option>
+                <option value="offered">Offered</option>
                 <option value="accepted">Accepted</option>
                 <option value="rejected">Rejected</option>
+                <option value="withdrawn">Withdrawn</option>
               </select>
             </div>
           </div>

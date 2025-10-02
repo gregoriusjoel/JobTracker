@@ -18,7 +18,7 @@ interface JobApplicationModalProps {
 type FormData = {
   company_name: string;
   position: string;
-  status: 'applied' | 'interview' | 'rejected' | 'accepted';
+  status: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date: string;
   application_platform: string;
   notes: string;
@@ -188,9 +188,15 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   >
                     <option value="applied">Applied</option>
-                    <option value="interview">Interview</option>
+                    <option value="screening">Screening</option>
+                    <option value="test">Test/Assessment</option>
+                    <option value="interview_user">Interview - User/Team</option>
+                    <option value="interview_hr">Interview - HR</option>
+                    <option value="interview_final">Interview - Final</option>
+                    <option value="offered">Offered</option>
                     <option value="accepted">Accepted</option>
                     <option value="rejected">Rejected</option>
+                    <option value="withdrawn">Withdrawn</option>
                   </select>
                 </div>
 

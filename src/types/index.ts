@@ -13,7 +13,7 @@ export interface JobApplication {
   user_id: number;
   company_name: string;
   position: string;
-  status: 'applied' | 'interview' | 'rejected' | 'accepted';
+  status: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date: string;
   application_platform?: string;
   notes?: string;
@@ -28,7 +28,7 @@ export interface JobApplication {
 export interface CreateJobApplicationRequest {
   company_name: string;
   position: string;
-  status?: 'applied' | 'interview' | 'rejected' | 'accepted';
+  status?: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date: string;
   application_platform?: string;
   notes?: string;
@@ -41,7 +41,7 @@ export interface CreateJobApplicationRequest {
 export interface UpdateJobApplicationRequest {
   company_name?: string;
   position?: string;
-  status?: 'applied' | 'interview' | 'rejected' | 'accepted';
+  status?: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date?: string;
   application_platform?: string;
   notes?: string;
@@ -74,7 +74,13 @@ export interface AuthResponse {
 export interface JobApplicationStats {
   total: number;
   applied: number;
-  interview: number;
-  rejected: number;
+  screening: number;
+  test: number;
+  interview_user: number;
+  interview_hr: number;
+  interview_final: number;
+  offered: number;
   accepted: number;
+  rejected: number;
+  withdrawn: number;
 }
