@@ -18,6 +18,12 @@ api.interceptors.request.use(
     // Ensure ngrok header is always present
     config.headers['ngrok-skip-browser-warning'] = 'true';
     
+    // Add ngrok bypass as query parameter as well (more reliable)
+    if (!config.params) {
+      config.params = {};
+    }
+    config.params['ngrok-skip-browser-warning'] = 'true';
+    
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {

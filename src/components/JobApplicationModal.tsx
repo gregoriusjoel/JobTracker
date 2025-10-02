@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Building2, User, Calendar, MapPin, DollarSign, FileText, Mail } from 'lucide-react';
+import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { JobApplication, CreateJobApplicationRequest, UpdateJobApplicationRequest } from '@/types';
 import { jobApplicationService } from '@/services/jobApplication';
@@ -224,7 +224,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <DollarSign size={16} className="inline mr-2" />
+                    <Banknote size={16} className="inline mr-2" />
                     Salary (IDR)
                   </label>
                   <input

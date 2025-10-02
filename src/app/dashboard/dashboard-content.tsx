@@ -10,7 +10,7 @@ import {
   Building2, 
   Calendar, 
   MapPin,
-  DollarSign,
+  Banknote,
   TrendingUp,
   Users,
   Clock,
@@ -409,7 +409,7 @@ export default function DashboardContent() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center text-sm text-gray-900">
-                          <DollarSign size={16} className="text-gray-400 mr-2" />
+                          <Banknote size={16} className="text-gray-400 mr-2" />
                           {formatCurrency(app.salary)}
                         </div>
                       </td>
