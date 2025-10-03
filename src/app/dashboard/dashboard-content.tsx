@@ -401,7 +401,7 @@ export default function DashboardContent() {
                       Salary
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Aksi
+                      Aksi  
                     </th>
                   </tr>
                 </thead>
