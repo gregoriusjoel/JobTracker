@@ -330,6 +330,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                 >
                   <option value="">Pilih Platform</option>
                   <option value="LinkedIn">LinkedIn</option>
+                  <option value="Dealls">Dealls</option>
                   <option value="JobStreet">JobStreet</option>
                   <option value="Indeed">Indeed</option>
                   <option value="Glints">Glints</option>
