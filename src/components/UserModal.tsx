@@ -20,6 +20,7 @@ type FormData = {
   email: string;
   password: string;
   role: 'admin' | 'user';
+  profile_image: string;
 };
 
 export const UserModal: React.FC<UserModalProps> = ({
@@ -47,13 +48,15 @@ export const UserModal: React.FC<UserModalProps> = ({
         setValue('email', user.email);
         setValue('role', user.role as 'admin' | 'user');
         setValue('password', ''); // Don't prefill password
+        setValue('profile_image', user.profile_image || '');
       } else {
         // Reset form for creating
         reset({
           username: '',
           email: '',
           password: '',
-          role: 'user'
+          role: 'user',
+          profile_image: ''
         });
       }
     }
@@ -66,7 +69,8 @@ export const UserModal: React.FC<UserModalProps> = ({
         const updateData: UpdateUserRequest = {
           username: data.username,
           email: data.email,
-          role: data.role
+          role: data.role,
+          profile_image: data.profile_image
         };
         // Only include password if it's not empty
         if (data.password && data.password.trim() !== '') {
@@ -216,6 +220,22 @@ export const UserModal: React.FC<UserModalProps> = ({
                 {errors.role && (
                   <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <User size={16} className="inline mr-2" />
+                  Profile Image URL
+                </label>
+                <input
+                  {...register('profile_image')}
+                  type="url"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Enter a URL to an image that will be used as the profile picture
+                </p>
               </div>
 
               {/* Actions */}

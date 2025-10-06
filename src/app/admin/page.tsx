@@ -234,6 +234,9 @@ export default function AdminPage() {
                       User
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Profile Image
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Role
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -255,11 +258,6 @@ export default function AdminPage() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
-                              <User className="h-5 w-5 text-white" />
-                            </div>
-                          </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
                               {user.username}
@@ -274,6 +272,33 @@ export default function AdminPage() {
                               {user.email}
                             </div>
                           </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center relative">
+                          {user.profile_image ? (
+                            <>
+                              <img
+                                src={user.profile_image}
+                                alt={`${user.username} profile`}
+                                className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  const fallback = e.currentTarget.parentElement?.querySelector('.fallback-avatar') as HTMLElement;
+                                  if (fallback) {
+                                    fallback.style.display = 'flex';
+                                  }
+                                }}
+                              />
+                              <div className="fallback-avatar h-16 w-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm absolute" style={{ display: 'none' }}>
+                                <User className="h-8 w-8 text-white" />
+                              </div>
+                            </>
+                          ) : (
+                            <div className="h-16 w-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
+                              <User className="h-8 w-8 text-white" />
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">

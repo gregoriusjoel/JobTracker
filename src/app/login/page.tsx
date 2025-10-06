@@ -53,11 +53,11 @@ export default function LoginPage() {
     
     try {
       console.log('Attempting login with:', { username: data.username, password: '[HIDDEN]' });
-      setDebugInfo('Mengirim request ke backend...');
+      setDebugInfo('Sedang Login...');
       
       const response = await authService.login(data);
       console.log('Login response:', response);
-      setDebugInfo('Login berhasil, menyimpan data...');
+      setDebugInfo('Login berhasil...');
       
       login(response.token, response.user);
       toast.success('🎉 Selamat datang! Ayo capai target hari ini!');

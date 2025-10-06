@@ -6,6 +6,7 @@ export interface CreateUserRequest {
   email: string;
   password: string;
   role: 'admin' | 'user';
+  profile_image?: string;
 }
 
 export interface UpdateUserRequest {
@@ -13,6 +14,7 @@ export interface UpdateUserRequest {
   email?: string;
   password?: string;
   role?: 'admin' | 'user';
+  profile_image?: string;
 }
 
 export const userService = {

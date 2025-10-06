@@ -3,7 +3,7 @@ export interface User {
   username: string;
   email: string;
   role: string;
-  profilePicture?: string;
+  profile_image?: string;
   created_at: string;
   updated_at: string;
 }
