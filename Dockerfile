@@ -1,34 +1,31 @@
-# Production image for running built Next.js app
-FROM node:18-alpine AS runner
+# Simplified Dockerfile for Next.js
+FROM node:18-alpine
+
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+# Install dependencies
+COPY package.json ./
+RUN npm install
 
-# Install runtime dependencies
-RUN apk add --no-cache libc6-compat
+# Copy source code
+COPY . .
 
-# Create a non-root user
+# Build the app
+RUN npm run build
+
+# Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy package.json for runtime deps
-COPY package.json ./
-RUN npm install --only=production
-
-# Copy built application
-COPY .next/standalone ./
-COPY .next/static ./.next/static
-COPY public ./public
-
-# Set proper permissions
-RUN chown -R nextjs:nodejs .next
+# Set ownership
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
