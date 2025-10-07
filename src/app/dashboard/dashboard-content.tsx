@@ -153,8 +153,22 @@ export default function DashboardContent() {
   const [editingApplication, setEditingApplication] = useState<JobApplication | undefined>();
 
   useEffect(() => {
-    fetchJobApplications();
-    fetchStats();
+    // Auto reject old applications first, then fetch current data
+    const initializeDashboard = async () => {
+      try {
+        // Auto reject applications older than 1 month
+        await jobApplicationService.autoRejectOld();
+      } catch (error) {
+        // Silent fail for auto reject - don't disturb user experience
+        console.warn('Auto reject failed:', error);
+      }
+      
+      // Then fetch current data
+      fetchJobApplications();
+      fetchStats();
+    };
+    
+    initializeDashboard();
   }, []);
 
   const fetchJobApplications = async () => {

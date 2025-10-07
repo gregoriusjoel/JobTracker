@@ -34,5 +34,10 @@ export const jobApplicationService = {
   getStats: async (): Promise<JobApplicationStats> => {
     const response = await api.get('/job-applications/stats');
     return response.data.stats;
+  },
+
+  autoRejectOld: async (): Promise<{ message: string; updated_count: number }> => {
+    const response = await api.post('/auto-reject-old-applications');
+    return response.data;
   }
 };
