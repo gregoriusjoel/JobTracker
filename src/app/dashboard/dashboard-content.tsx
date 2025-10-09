@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
   Search, 
@@ -17,7 +17,12 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Globe
+  Globe,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Mail,
+  FileText
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { JobApplication, JobApplicationStats } from '@/types';
@@ -151,6 +156,7 @@ export default function DashboardContent() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<JobApplication | undefined>();
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     // Auto reject old applications first, then fetch current data
@@ -207,12 +213,47 @@ export default function DashboardContent() {
     }
   };
 
-  const filteredApplications = jobApplications.filter((app) => {
-    const matchesSearch = app.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.position.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === '' || app.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const toggleCardExpansion = (cardId: number) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(cardId)) {
+      newExpanded.delete(cardId);
+    } else {
+      newExpanded.add(cardId);
+    }
+    setExpandedCards(newExpanded);
+  };
+
+  const getStatusPriority = (status: string): number => {
+    const priorities = {
+      'test': 1,
+      'interview_user': 2,
+      'interview_hr': 3,
+      'interview_final': 4,
+      'screening': 5,
+      'offered': 6,
+      'applied': 7,
+      'accepted': 8,
+      'withdrawn': 9,
+      'rejected': 10
+    };
+    return priorities[status as keyof typeof priorities] || 99;
+  };
+
+  const filteredApplications = jobApplications
+    .filter((app) => {
+      const matchesSearch = app.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           app.position.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === '' || app.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Primary sort: by status priority
+      const priorityDiff = getStatusPriority(a.status) - getStatusPriority(b.status);
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // Secondary sort: by application date (newest first)
+      return new Date(b.application_date).getTime() - new Date(a.application_date).getTime();
+    });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID');
@@ -420,68 +461,212 @@ export default function DashboardContent() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredApplications.map((app, index) => (
-                    <motion.tr
-                      key={app.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4">
-                        <div>
-                          <div className="flex items-center">
-                            <Building2 size={16} className="text-gray-400 mr-2" />
-                            <div className="font-medium text-gray-900">{app.company_name}</div>
-                          </div>
-                          <div className="text-sm text-gray-600 mt-1">{app.position}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusBadge status={app.status} />
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Calendar size={16} className="text-gray-400 mr-2" />
-                          {formatDate(app.application_date)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <MapPin size={16} className="text-gray-400 mr-2" />
-                          {app.location || '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Globe size={16} className="text-gray-400 mr-2" />
-                          {app.application_platform || '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Banknote size={16} className="text-gray-400 mr-2" />
-                          {formatCurrency(app.salary)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button 
-                            onClick={() => handleEdit(app)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(app.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
+                  {filteredApplications.map((app, index) => {
+                    const isExpanded = expandedCards.has(app.id);
+                    return (
+                      <React.Fragment key={app.id}>
+                        {/* Main Row */}
+                        <motion.tr
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="hover:bg-gray-50"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center">
+                              <button
+                                onClick={() => toggleCardExpansion(app.id)}
+                                className="mr-2 p-1 rounded-md hover:bg-gray-200 transition-colors"
+                              >
+                                {isExpanded ? (
+                                  <ChevronUp size={16} className="text-gray-400" />
+                                ) : (
+                                  <ChevronDown size={16} className="text-gray-400" />
+                                )}
+                              </button>
+                              <Building2 size={16} className="text-gray-400 mr-2" />
+                              <div>
+                                <div className="font-medium text-gray-900">{app.company_name}</div>
+                                <div className="text-sm text-gray-600 mt-1">{app.position}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <StatusBadge status={app.status} />
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center text-sm text-gray-900">
+                              <Calendar size={16} className="text-gray-400 mr-2" />
+                              {formatDate(app.application_date)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center text-sm text-gray-900">
+                              <MapPin size={16} className="text-gray-400 mr-2" />
+                              {app.location || '-'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center text-sm text-gray-900">
+                              <Globe size={16} className="text-gray-400 mr-2" />
+                              {app.application_platform || '-'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center text-sm text-gray-900">
+                              <Banknote size={16} className="text-gray-400 mr-2" />
+                              {formatCurrency(app.salary)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button 
+                                onClick={() => handleEdit(app)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(app.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </motion.tr>
+                        
+                        {/* Expandable Details Row */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.tr
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <td colSpan={7} className="px-6 py-0">
+                                <motion.div
+                                  initial={{ height: 0 }}
+                                  animate={{ height: 'auto' }}
+                                  exit={{ height: 0 }}
+                                  transition={{ duration: 0.3 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="py-4 bg-gray-50 rounded-lg mx-2 mb-2">
+                                    <div className="px-4">
+                                      <h4 className="text-sm font-semibold text-gray-800 mb-3">Detail Lengkap</h4>
+                                      
+                                      {/* Basic Info Grid */}
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        {/* Company Name (redundant but complete) */}
+                                        <div className="flex items-center space-x-2">
+                                          <Building2 size={16} className="text-gray-400" />
+                                          <span className="text-sm font-medium text-gray-600">Perusahaan:</span>
+                                          <span className="text-sm text-gray-800">{app.company_name}</span>
+                                        </div>
+                                        
+                                        {/* Position (redundant but complete) */}
+                                        <div className="flex items-center space-x-2">
+                                          <User size={16} className="text-gray-400" />
+                                          <span className="text-sm font-medium text-gray-600">Posisi:</span>
+                                          <span className="text-sm text-gray-800">{app.position}</span>
+                                        </div>
+                                        
+                                        {/* Application Platform */}
+                                        <div className="flex items-center space-x-2">
+                                          <Globe size={16} className="text-gray-400" />
+                                          <span className="text-sm font-medium text-gray-600">Platform:</span>
+                                          <span className="text-sm text-gray-800">{app.application_platform || '-'}</span>
+                                        </div>
+                                        
+                                        {/* Location */}
+                                        <div className="flex items-center space-x-2">
+                                          <MapPin size={16} className="text-gray-400" />
+                                          <span className="text-sm font-medium text-gray-600">Lokasi:</span>
+                                          <span className="text-sm text-gray-800">{app.location || '-'}</span>
+                                        </div>
+                                        
+                                        {/* Salary */}
+                                        <div className="flex items-center space-x-2">
+                                          <Banknote size={16} className="text-gray-400" />
+                                          <span className="text-sm font-medium text-gray-600">Salary:</span>
+                                          <span className="text-sm text-gray-800">{formatCurrency(app.salary)}</span>
+                                        </div>
+                                        
+                                        {/* Application Date */}
+                                        <div className="flex items-center space-x-2">
+                                          <Calendar size={16} className="text-gray-400" />
+                                          <span className="text-sm font-medium text-gray-600">Tanggal Apply:</span>
+                                          <span className="text-sm text-gray-800">{formatDate(app.application_date)}</span>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Contact Information */}
+                                      {(app.contact_person || app.contact_email) && (
+                                        <div className="border-t border-gray-200 pt-3 mb-4">
+                                          <h5 className="text-sm font-semibold text-gray-700 mb-2">Informasi Kontak</h5>
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* Contact Person */}
+                                            {app.contact_person && (
+                                              <div className="flex items-center space-x-2">
+                                                <User size={16} className="text-gray-400" />
+                                                <span className="text-sm font-medium text-gray-600">Contact Person:</span>
+                                                <span className="text-sm text-gray-800">{app.contact_person}</span>
+                                              </div>
+                                            )}
+                                            
+                                            {/* Contact Email */}
+                                            {app.contact_email && (
+                                              <div className="flex items-center space-x-2">
+                                                <Mail size={16} className="text-gray-400" />
+                                                <span className="text-sm font-medium text-gray-600">Contact Email:</span>
+                                                <span className="text-sm text-gray-800">{app.contact_email}</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Notes/Description */}
+                                      {app.notes && (
+                                        <div className="border-t border-gray-200 pt-3 mb-4">
+                                          <div className="flex items-start space-x-2">
+                                            <FileText size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                                            <div className="flex-1">
+                                              <span className="text-sm font-semibold text-gray-700">Catatan:</span>
+                                              <p className="text-sm text-gray-800 mt-1 leading-relaxed whitespace-pre-wrap">{app.notes}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Timestamps */}
+                                      <div className="border-t border-gray-200 pt-3">
+                                        <h5 className="text-sm font-semibold text-gray-700 mb-2">Informasi Sistem</h5>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-500">
+                                          <div className="flex items-center space-x-2">
+                                            <Calendar size={14} className="text-gray-400" />
+                                            <span>Dibuat: {formatDate(app.created_at)}</span>
+                                          </div>
+                                          {app.updated_at !== app.created_at && (
+                                            <div className="flex items-center space-x-2">
+                                              <Calendar size={14} className="text-gray-400" />
+                                              <span>Diupdate: {formatDate(app.updated_at)}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              </td>
+                            </motion.tr>
+                          )}
+                        </AnimatePresence>
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

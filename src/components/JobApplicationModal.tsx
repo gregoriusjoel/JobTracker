@@ -46,7 +46,33 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
   ]);
   const [filteredLocations, setFilteredLocations] = useState<string[]>([]);
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const [formattedSalary, setFormattedSalary] = useState<string>('');
   const isEditing = !!jobApplication;
+
+  // Format number with dots as thousand separators
+  const formatSalaryInput = (value: string): string => {
+    // Remove all non-digit characters
+    const numbers = value.replace(/\D/g, '');
+    
+    // Add dots as thousand separators
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  // Remove dots and return clean number
+  const parseSalaryInput = (formattedValue: string): number => {
+    const cleanValue = formattedValue.replace(/\./g, '');
+    return cleanValue === '' ? 0 : parseInt(cleanValue, 10);
+  };
+
+  // Handle salary input change
+  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const formatted = formatSalaryInput(inputValue);
+    const numericValue = parseSalaryInput(formatted);
+    
+    setFormattedSalary(formatted);
+    setValue('salary', numericValue === 0 ? '' : numericValue);
+  };
 
   const {
     register,
@@ -83,6 +109,9 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
         setValue('contact_email', jobApplication.contact_email || '');
         setValue('salary', jobApplication.salary || '');
         setValue('location', jobApplication.location || '');
+        
+        // Set formatted salary for display
+        setFormattedSalary(jobApplication.salary ? formatSalaryInput(jobApplication.salary.toString()) : '');
       } else {
         // Reset form for creating
         reset({
@@ -98,6 +127,9 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
           salary: '',
           location: ''
         });
+        
+        // Clear formatted salary for new entries
+        setFormattedSalary('');
       }
     }
   }, [isOpen, jobApplication, setValue, reset]);
@@ -497,6 +529,14 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                     Salary (IDR)
                   </label>
                   <input
+                    type="text"
+                    value={formattedSalary}
+                    onChange={handleSalaryChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Contoh: 10.000.000"
+                  />
+                  {/* Hidden input for form validation */}
+                  <input
                     {...register('salary', {
                       validate: (value) => {
                         if (value === '' || value === undefined) return true;
@@ -504,10 +544,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                         return !isNaN(num) && num >= 0 || 'Salary harus berupa angka positif';
                       }
                     })}
-                    type="number"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Contoh: 10000000"
-                    min="0"
+                    type="hidden"
                   />
                   {errors.salary && (
                     <p className="mt-1 text-sm text-red-600">{errors.salary.message}</p>
