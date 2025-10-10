@@ -141,28 +141,52 @@ const JobTypeBadge: React.FC<{ jobType?: string }> = ({ jobType }) => {
   const getJobTypeConfig = (type: string) => {
     switch (type) {
       case 'intern':
-        return { color: 'bg-blue-100 text-blue-800', label: 'Intern' };
+        return { 
+          style: 'bg-blue-100 text-blue-800', 
+          label: 'Intern' 
+        };
       case 'full_time':
-        return { color: 'bg-green-100 text-green-800', label: 'Full-time' };
+        return { 
+          style: 'bg-green-100 text-green-800', 
+          label: 'Full Time' 
+        };
       case 'part_time':
-        return { color: 'bg-yellow-100 text-yellow-800', label: 'Part-time' };
+        return { 
+          style: 'bg-yellow-100 text-yellow-800', 
+          label: 'Part Time' 
+        };
       case 'freelance':
-        return { color: 'bg-purple-100 text-purple-800', label: 'Freelance' };
+        return { 
+          style: 'bg-purple-100 text-purple-800', 
+          label: 'Freelance' 
+        };
       case 'contract':
-        return { color: 'bg-orange-100 text-orange-800', label: 'Contract' };
+        return { 
+          style: 'bg-orange-100 text-orange-800', 
+          label: 'Contract' 
+        };
       case 'remote':
-        return { color: 'bg-indigo-100 text-indigo-800', label: 'Remote' };
+        return { 
+          style: 'bg-indigo-100 text-indigo-800', 
+          label: 'Remote' 
+        };
       case 'hybrid':
-        return { color: 'bg-teal-100 text-teal-800', label: 'Hybrid' };
+        return { 
+          style: 'bg-teal-100 text-teal-800', 
+          label: 'Hybrid' 
+        };
       default:
-        return { color: 'bg-gray-100 text-gray-800', label: type };
+        return { 
+          style: 'bg-gray-100 text-gray-800', 
+          label: type 
+        };
     }
   };
 
   const config = getJobTypeConfig(jobType);
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.style}`}>
       {config.label}
     </span>
   );

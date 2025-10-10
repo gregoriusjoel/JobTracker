@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail, Briefcase } from 'lucide-react';
+import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail, Briefcase, GraduationCap, Clock, Rocket, FileCheck, Globe, RefreshCw } from 'lucide-react';
 import { JobApplication, CreateJobApplicationRequest, UpdateJobApplicationRequest } from '@/types';
 import { jobApplicationService } from '@/services/jobApplication';
 
@@ -213,10 +213,11 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                 rotateX: { duration: 0.3 }
               }
             }}
-            className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide"
+            className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide relative"
             style={{
               scrollbarWidth: 'none', // Firefox
-              msOverflowStyle: 'none' // IE/Edge
+              msOverflowStyle: 'none', // IE/Edge
+              minHeight: '400px' // Ensure minimum height for success notification
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -257,9 +258,9 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 1.2 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute inset-0 bg-gradient-to-br from-green-500/90 to-emerald-600/90 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10"
+                  className="absolute inset-0 bg-gradient-to-br from-green-500/90 to-emerald-600/90 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10 min-h-[400px]"
                 >
-                  <div className="text-center text-white relative">
+                  <div className="text-center text-white relative px-8 py-6 max-w-md mx-auto">
                     {/* Floating particles animation */}
                     {[...Array(6)].map((_, i) => (
                       <motion.div
@@ -289,7 +290,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-                      className="w-20 h-20 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-lg"
+                      className="w-20 h-20 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-lg"
                     >
                       <motion.svg
                         initial={{ pathLength: 0 }}
@@ -312,7 +313,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 1.2, duration: 0.4 }}
-                      className="text-2xl font-bold mb-2"
+                      className="text-2xl font-bold mb-4 leading-tight"
                     >
                       Berhasil!
                     </motion.h3>
@@ -320,7 +321,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 1.4, duration: 0.4 }}
-                      className="text-lg opacity-90"
+                      className="text-lg opacity-90 leading-relaxed"
                     >
                       {isEditing ? 'Aplikasi berhasil diperbarui' : 'Aplikasi berhasil ditambahkan'}
                     </motion.p>
@@ -413,7 +414,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                 </label>
                 <select
                   {...register('job_type')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
                 >
                   <option value="">Pilih Tipe Pekerjaan</option>
                   <option value="intern">Intern</option>
