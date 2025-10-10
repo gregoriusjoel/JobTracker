@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail } from 'lucide-react';
+import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail, Briefcase } from 'lucide-react';
 import { JobApplication, CreateJobApplicationRequest, UpdateJobApplicationRequest } from '@/types';
 import { jobApplicationService } from '@/services/jobApplication';
 
@@ -21,6 +21,7 @@ type FormData = {
   application_date: string;
   application_platform: string;
   custom_platform: string;
+  job_type: 'intern' | 'full_time' | 'part_time' | 'freelance' | 'contract' | 'remote' | 'hybrid' | '';
   notes: string;
   contact_person: string;
   contact_email: string;
@@ -109,6 +110,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
         setValue('contact_email', jobApplication.contact_email || '');
         setValue('salary', jobApplication.salary || '');
         setValue('location', jobApplication.location || '');
+        setValue('job_type', jobApplication.job_type || '');
         
         // Set formatted salary for display
         setFormattedSalary(jobApplication.salary ? formatSalaryInput(jobApplication.salary.toString()) : '');
@@ -125,7 +127,8 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
           contact_person: '',
           contact_email: '',
           salary: '',
-          location: ''
+          location: '',
+          job_type: ''
         });
         
         // Clear formatted salary for new entries
@@ -400,6 +403,27 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                     <p className="mt-1 text-sm text-red-600">{errors.application_date.message}</p>
                   )}
                 </div>
+              </div>
+
+              {/* Job Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Briefcase size={16} className="inline mr-2" />
+                  Tipe Pekerjaan
+                </label>
+                <select
+                  {...register('job_type')}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900"
+                >
+                  <option value="">Pilih Tipe Pekerjaan</option>
+                  <option value="intern">Intern</option>
+                  <option value="full_time">Full Time</option>
+                  <option value="part_time">Part Time</option>
+                  <option value="freelance">Freelance</option>
+                  <option value="contract">Contract</option>
+                  <option value="remote">Remote</option>
+                  <option value="hybrid">Hybrid</option>
+                </select>
               </div>
 
               {/* Platform Selection */}

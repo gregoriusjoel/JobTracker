@@ -16,6 +16,7 @@ export interface JobApplication {
   status: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date: string;
   application_platform?: string;
+  job_type?: 'intern' | 'full_time' | 'part_time' | 'freelance' | 'contract' | 'remote' | 'hybrid';
   notes?: string;
   contact_person?: string;
   contact_email?: string;
@@ -31,6 +32,7 @@ export interface CreateJobApplicationRequest {
   status?: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date: string;
   application_platform?: string;
+  job_type?: 'intern' | 'full_time' | 'part_time' | 'freelance' | 'contract' | 'remote' | 'hybrid';
   notes?: string;
   contact_person?: string;
   contact_email?: string;
@@ -44,6 +46,7 @@ export interface UpdateJobApplicationRequest {
   status?: 'applied' | 'screening' | 'test' | 'interview_user' | 'interview_hr' | 'interview_final' | 'offered' | 'accepted' | 'rejected' | 'withdrawn';
   application_date?: string;
   application_platform?: string;
+  job_type?: 'intern' | 'full_time' | 'part_time' | 'freelance' | 'contract' | 'remote' | 'hybrid';
   notes?: string;
   contact_person?: string;
   contact_email?: string;

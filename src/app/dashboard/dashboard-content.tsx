@@ -22,7 +22,8 @@ import {
   ChevronUp,
   User,
   Mail,
-  FileText
+  FileText,
+  Briefcase
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { JobApplication, JobApplicationStats } from '@/types';
@@ -130,6 +131,39 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
       <Icon size={12} className="mr-1" />
       {label}
+    </span>
+  );
+};
+
+const JobTypeBadge: React.FC<{ jobType?: string }> = ({ jobType }) => {
+  if (!jobType) return <span className="text-gray-400">-</span>;
+  
+  const getJobTypeConfig = (type: string) => {
+    switch (type) {
+      case 'intern':
+        return { color: 'bg-blue-100 text-blue-800', label: 'Intern' };
+      case 'full_time':
+        return { color: 'bg-green-100 text-green-800', label: 'Full-time' };
+      case 'part_time':
+        return { color: 'bg-yellow-100 text-yellow-800', label: 'Part-time' };
+      case 'freelance':
+        return { color: 'bg-purple-100 text-purple-800', label: 'Freelance' };
+      case 'contract':
+        return { color: 'bg-orange-100 text-orange-800', label: 'Contract' };
+      case 'remote':
+        return { color: 'bg-indigo-100 text-indigo-800', label: 'Remote' };
+      case 'hybrid':
+        return { color: 'bg-teal-100 text-teal-800', label: 'Hybrid' };
+      default:
+        return { color: 'bg-gray-100 text-gray-800', label: type };
+    }
+  };
+
+  const config = getJobTypeConfig(jobType);
+
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+      {config.label}
     </span>
   );
 };
@@ -447,6 +481,9 @@ export default function DashboardContent() {
                       Tanggal Apply
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Job Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Lokasi
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -499,6 +536,9 @@ export default function DashboardContent() {
                               <Calendar size={16} className="text-gray-400 mr-2" />
                               {formatDate(app.application_date)}
                             </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <JobTypeBadge jobType={app.job_type} />
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center text-sm text-gray-900">
@@ -600,6 +640,15 @@ export default function DashboardContent() {
                                           <span className="text-sm font-medium text-gray-600">Tanggal Apply:</span>
                                           <span className="text-sm text-gray-800">{formatDate(app.application_date)}</span>
                                         </div>
+                                        
+                                        {/* Job Type */}
+                                        {app.job_type && (
+                                          <div className="flex items-center space-x-2">
+                                            <Briefcase size={16} className="text-gray-400" />
+                                            <span className="text-sm font-medium text-gray-600">Job Type:</span>
+                                            <JobTypeBadge jobType={app.job_type} />
+                                          </div>
+                                        )}
                                       </div>
                                       
                                       {/* Contact Information */}
