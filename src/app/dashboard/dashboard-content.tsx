@@ -591,7 +591,7 @@ export default function DashboardContent() {
                 <tbody style={{
                   backgroundColor: isDark ? '#1f2937' : '#ffffff'
                 }}>
-                  {filteredApplications.map((app, index) => {
+                  {filteredApplications.map((app) => {
                     const isExpanded = expandedCards.has(app.id);
                     return (
                       <React.Fragment key={app.id}>
@@ -599,7 +599,7 @@ export default function DashboardContent() {
                         <motion.tr
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
+                          transition={{ duration: 0.3 }}
                           style={{
                             backgroundColor: isDark ? '#1f2937' : '#ffffff',
                             borderBottom: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`

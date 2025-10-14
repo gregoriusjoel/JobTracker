@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -55,9 +56,11 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
       >
         <div className="relative">
           {user?.profile_image ? (
-            <img
+            <Image
               src={user.profile_image}
               alt={`${user?.name || user?.username} profile`}
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -95,9 +98,11 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
                 <div className="relative">
                   {user?.profile_image ? (
                     <>
-                      <img
+                      <Image
                         src={user.profile_image}
                         alt={`${user?.name || user?.username} profile`}
+                        width={48}
+                        height={48}
                         className="w-12 h-12 rounded-full object-cover"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';

@@ -44,7 +44,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         const element = el as HTMLElement;
         const display = element.style.display;
         element.style.display = 'none';
-        element.offsetHeight; // trigger reflow
+        void element.offsetHeight; // trigger reflow
         element.style.display = display;
       });
       

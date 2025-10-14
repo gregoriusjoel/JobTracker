@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { X, User, Mail, Key, Shield, Camera, Edit, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { User as UserType } from '@/types';
@@ -34,7 +35,7 @@ export const UserModal: React.FC<UserModalProps> = ({
   const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  // const [imageFile, setImageFile] = useState<File | null>(null); // removed unused variable
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!user;
 
@@ -62,7 +63,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const img = new Image();
+      const img = new (window.Image)();
       
       img.onload = () => {
         // Calculate new dimensions
@@ -118,7 +119,7 @@ export const UserModal: React.FC<UserModalProps> = ({
       try {
         // Compress image before setting preview
         const compressedBase64 = await compressImage(file);
-        setImageFile(file);
+        // setImageFile(file); // removed unused
         setProfileImagePreview(compressedBase64);
         setValue('profile_image', compressedBase64);
       } catch (error) {
@@ -158,7 +159,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     setIsLoading(true);
     try {
       // Use the compressed image from preview or existing profile image
-      let profileImageUrl = profileImagePreview || data.profile_image;
+      const profileImageUrl = profileImagePreview || data.profile_image;
 
       if (isEditing && user) {
         const updateData: UpdateUserRequest = {
@@ -191,7 +192,7 @@ export const UserModal: React.FC<UserModalProps> = ({
       onClose();
       reset();
       setProfileImagePreview(null);
-      setImageFile(null);
+      // setImageFile(null); // removed unused
     } catch (error) {
       const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Terjadi kesalahan';
       toast.error(errorMessage);
@@ -204,7 +205,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     onClose();
     reset();
     setProfileImagePreview(null);
-    setImageFile(null);
+    // setImageFile(null); // removed unused
   };
 
   return (
@@ -407,16 +408,18 @@ export const UserModal: React.FC<UserModalProps> = ({
                 {profileImagePreview && (
                   <div className="mt-3 flex justify-center">
                     <div className="relative">
-                      <img
+                      <Image
                         src={profileImagePreview}
                         alt="Profile preview"
+                        width={80}
+                        height={80}
                         className="w-20 h-20 object-cover rounded-full border-2 border-gray-200 shadow-sm"
                       />
                       <button
                         type="button"
                         onClick={() => {
                           setProfileImagePreview(null);
-                          setImageFile(null);
+                          // setImageFile(null); // removed unused
                           setValue('profile_image', '');
                         }}
                         className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm"
