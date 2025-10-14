@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Mail, Key, Shield } from 'lucide-react';
+import { X, User, Mail, Key, Shield, Camera, Edit, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { User as UserType } from '@/types';
 import { CreateUserRequest, UpdateUserRequest, userService } from '@/services/user';
@@ -17,6 +17,7 @@ interface UserModalProps {
 
 type FormData = {
   username: string;
+  name: string;
   email: string;
   password: string;
   role: 'admin' | 'user';
@@ -30,7 +31,46 @@ export const UserModal: React.FC<UserModalProps> = ({
   user
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!user;
+
+  const compressImage = (file: File, maxWidth: number = 400, maxHeight: number = 400, quality: number = 0.7): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
 
   const {
     register,
@@ -40,24 +80,54 @@ export const UserModal: React.FC<UserModalProps> = ({
     setValue
   } = useForm<FormData>();
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Ukuran file terlalu besar. Maksimal 5MB.');
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        toast.error('File harus berupa gambar.');
+        return;
+      }
+
+      try {
+        // Compress image before setting preview
+        const compressedBase64 = await compressImage(file);
+        setImageFile(file);
+        setProfileImagePreview(compressedBase64);
+        setValue('profile_image', compressedBase64);
+      } catch (error) {
+        toast.error('Gagal memproses gambar.');
+        console.error('Image compression failed:', error);
+      }
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       if (user) {
         // Fill form for editing
         setValue('username', user.username);
+        setValue('name', user.name || '');
         setValue('email', user.email);
         setValue('role', user.role as 'admin' | 'user');
         setValue('password', ''); // Don't prefill password
         setValue('profile_image', user.profile_image || '');
+        setProfileImagePreview(user.profile_image || null);
       } else {
         // Reset form for creating
         reset({
           username: '',
+          name: '',
           email: '',
           password: '',
           role: 'user',
           profile_image: ''
         });
+        setProfileImagePreview(null);
       }
     }
   }, [isOpen, user, setValue, reset]);
@@ -65,12 +135,16 @@ export const UserModal: React.FC<UserModalProps> = ({
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
+      // Use the compressed image from preview or existing profile image
+      let profileImageUrl = profileImagePreview || data.profile_image;
+
       if (isEditing && user) {
         const updateData: UpdateUserRequest = {
           username: data.username,
+          name: data.name,
           email: data.email,
           role: data.role,
-          profile_image: data.profile_image
+          profile_image: profileImageUrl
         };
         // Only include password if it's not empty
         if (data.password && data.password.trim() !== '') {
@@ -79,13 +153,23 @@ export const UserModal: React.FC<UserModalProps> = ({
         await userService.update(user.id, updateData);
         toast.success('User berhasil diperbarui');
       } else {
-        await userService.create(data as CreateUserRequest);
+        const createData: CreateUserRequest = {
+          username: data.username,
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          role: data.role,
+          profile_image: profileImageUrl
+        };
+        await userService.create(createData);
         toast.success('User berhasil ditambahkan');
       }
 
       onSuccess();
       onClose();
       reset();
+      setProfileImagePreview(null);
+      setImageFile(null);
     } catch (error) {
       const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Terjadi kesalahan';
       toast.error(errorMessage);
@@ -97,6 +181,8 @@ export const UserModal: React.FC<UserModalProps> = ({
   const handleClose = () => {
     onClose();
     reset();
+    setProfileImagePreview(null);
+    setImageFile(null);
   };
 
   return (
@@ -113,24 +199,41 @@ export const UserModal: React.FC<UserModalProps> = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white rounded-xl shadow-xl w-full max-w-md"
+            className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {isEditing ? 'Edit User' : 'Add New User'}
-              </h2>
+            <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50 flex-shrink-0 rounded-t-xl">
+              <div className="flex items-center space-x-3">
+                {isEditing ? (
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <Edit className="h-5 w-5 text-white" />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <Plus className="h-5 w-5 text-white" />
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {isEditing ? 'Edit User' : 'Add New User'}
+                  </h2>
+                  {isEditing && user && (
+                    <p className="text-sm text-gray-600">Editing: {user.username}</p>
+                  )}
+                </div>
+              </div>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all duration-200"
               >
                 <X size={20} className="text-gray-500" />
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+            <form id="user-form" onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <User size={16} className="inline mr-2" />
@@ -139,11 +242,27 @@ export const UserModal: React.FC<UserModalProps> = ({
                 <input
                   {...register('username', { required: 'Username wajib diisi' })}
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
                   placeholder="Enter username"
                 />
                 {errors.username && (
                   <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <User size={16} className="inline mr-2" />
+                  Full Name
+                </label>
+                <input
+                  {...register('name')}
+                  type="text"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
+                  placeholder="Enter full name"
+                />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
                 )}
               </div>
 
@@ -161,7 +280,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                     }
                   })}
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
                   placeholder="Enter email"
                 />
                 {errors.email && (
@@ -197,8 +316,8 @@ export const UserModal: React.FC<UserModalProps> = ({
                     }
                   })}
                   type="password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-                  placeholder={isEditing ? "Leave empty to keep current" : "Enter password"}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
+                  placeholder={isEditing ? "Leave empty to keep current password" : "Enter password"}
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
@@ -212,7 +331,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                 </label>
                 <select
                   {...register('role', { required: 'Role wajib dipilih' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 transition-all duration-200 hover:border-gray-400"
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -224,47 +343,87 @@ export const UserModal: React.FC<UserModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User size={16} className="inline mr-2" />
-                  Profile Image URL
+                  <Camera size={16} className="inline mr-2" />
+                  Profile Image
                 </label>
+                
+                {/* Hidden File Input */}
                 <input
-                  {...register('profile_image')}
-                  type="url"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-                  placeholder="https://example.com/image.jpg"
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
                 />
-                <p className="mt-1 text-xs text-gray-500">
-                  Enter a URL to an image that will be used as the profile picture
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex justify-end space-x-4 pt-4">
+                
+                {/* Upload Button */}
                 <button
                   type="button"
-                  onClick={handleClose}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-purple-300 rounded-lg bg-purple-50 hover:bg-purple-100 hover:border-purple-400 transition-all duration-200 text-purple-700"
                 >
-                  Cancel
+                  <Camera size={18} />
+                  <span className="font-medium">Choose Image</span>
                 </button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Saving...
+                
+                {/* Image Preview */}
+                {profileImagePreview && (
+                  <div className="mt-3 flex justify-center">
+                    <div className="relative">
+                      <img
+                        src={profileImagePreview}
+                        alt="Profile preview"
+                        className="w-20 h-20 object-cover rounded-full border-2 border-gray-200 shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileImagePreview(null);
+                          setImageFile(null);
+                          setValue('profile_image', '');
+                        }}
+                        className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
                     </div>
-                  ) : (
-                    isEditing ? 'Update' : 'Create'
-                  )}
-                </motion.button>
+                  </div>
+                )}
+                
+                <p className="mt-2 text-xs text-gray-500 text-center">
+                  Upload an image that will be used as the profile picture (Max 5MB)
+                </p>
+              </div>
               </div>
             </form>
+
+            {/* Actions - Fixed Footer */}
+            <div className="flex justify-end space-x-4 px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0 rounded-b-xl">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium"
+              >
+                Cancel
+              </button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                form="user-form"
+                disabled={isLoading}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg font-medium"
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
+                  </div>
+                ) : (
+                  isEditing ? 'Update' : 'Create'
+                )}
+              </motion.button>
+            </div>
           </motion.div>
         </motion.div>
       )}

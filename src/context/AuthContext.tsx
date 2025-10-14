@@ -9,7 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
-  updateUser: (user: User) => void;
+  updateUser: (user: User) => Promise<void>;
   loading: boolean;
 }
 
@@ -59,10 +59,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateUser = (userData: User) => {
+  const updateUser = async (userData: User) => {
     if (mounted) {
+      // Update local state immediately
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
+      
+      // Optionally refresh from server to ensure consistency
+      try {
+        const profileData = await authService.getProfile();
+        const serverUser = profileData.user;
+        localStorage.setItem('user', JSON.stringify(serverUser));
+        setUser(serverUser);
+      } catch (error) {
+        console.warn('Failed to refresh user profile from server:', error);
+        // Keep local update if server refresh fails
+      }
     }
   };
 

@@ -3,6 +3,7 @@ import { User } from '@/types';
 
 export interface CreateUserRequest {
   username: string;
+  name?: string;
   email: string;
   password: string;
   role: 'admin' | 'user';
@@ -11,6 +12,7 @@ export interface CreateUserRequest {
 
 export interface UpdateUserRequest {
   username?: string;
+  name?: string;
   email?: string;
   password?: string;
   role?: 'admin' | 'user';
@@ -35,5 +37,10 @@ export const userService = {
 
   delete: async (id: number): Promise<void> => {
     await api.delete(`/admin/users/${id}`);
+  },
+
+  updateProfile: async (data: UpdateUserRequest): Promise<User> => {
+    const response = await api.put('/profile', data);
+    return response.data.user;
   }
 };

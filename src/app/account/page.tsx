@@ -15,6 +15,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { userService } from '@/services/user';
 
 export default function AccountPage() {
   const { user, updateUser } = useAuth();
@@ -23,6 +24,7 @@ export default function AccountPage() {
   
   const [formData, setFormData] = useState({
     username: user?.username || '',
+    name: user?.name || '',
     email: user?.email || '',
     currentPassword: '',
     newPassword: '',
@@ -41,7 +43,12 @@ export default function AccountPage() {
       router.push('/login');
       return;
     }
-  }, [user, router]);
+    
+    // Set profile image from user data if exists
+    if (user.profile_image && !profileImage) {
+      setProfileImage(user.profile_image);
+    }
+  }, [user, router, profileImage]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,11 +62,47 @@ export default function AccountPage() {
     fileInputRef.current?.click();
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File, maxWidth: number = 400, maxHeight: number = 400, quality: number = 0.7): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Ukuran file terlalu besar. Maksimal 5MB.');
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit for raw file
+        toast.error('Ukuran file terlalu besar. Maksimal 2MB.');
         return;
       }
 
@@ -68,17 +111,15 @@ export default function AccountPage() {
         return;
       }
 
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setProfileImage(result);
-        toast.success('Gambar berhasil dimuat!');
-      };
-      reader.onerror = () => {
-        toast.error('Error membaca file. Silakan coba lagi.');
-      };
-      reader.readAsDataURL(file);
+      try {
+        setImageFile(file);
+        const compressedBase64 = await compressImage(file);
+        setProfileImage(compressedBase64);
+        toast.success('Gambar berhasil dimuat dan dikompres!');
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        toast.error('Error memproses gambar. Silakan coba lagi.');
+      }
     }
   };
 
@@ -117,26 +158,28 @@ export default function AccountPage() {
         }
       }
 
-      // Simulate API call (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Update user data
-      const updatedUser = {
-        ...user!,
+      // Call API to update profile
+      const updateData: any = {
         username: formData.username,
+        name: formData.name,
         email: formData.email
       };
 
-      updateUser(updatedUser);
-      toast.success('Profil berhasil diperbarui!');
+      // Add password if being changed
+      if (formData.newPassword) {
+        updateData.password = formData.newPassword;
+      }
+
+      // Add profile image if uploaded
+      if (profileImage) {
+        updateData.profile_image = profileImage;
+      }
+
+      const updatedUser = await userService.updateProfile(updateData);
       
-      // Clear password fields
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
+      // Update local user state and refresh from server
+      await updateUser(updatedUser);
+      toast.success('Profil berhasil diperbarui!');
 
     } catch (error) {
       toast.error('Gagal memperbarui profil. Silakan coba lagi.');
@@ -156,16 +199,16 @@ export default function AccountPage() {
         <div className="mb-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4"
+            className="flex items-center text-gray-300 hover:text-white mb-4"
           >
             <ArrowLeft size={20} className="mr-2" />
             Kembali
           </button>
           
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-white">
             Pengaturan Akun
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-gray-300 mt-2">
             Kelola informasi pribadi dan keamanan akun Anda
           </p>
         </div>
@@ -226,13 +269,13 @@ export default function AccountPage() {
                 <span>Upload Photo</span>
               </button>
               
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+              <p className="text-sm text-gray-300 text-center">
                 Klik foto untuk mengubah gambar profil<br />
                 Format: JPG, PNG. Maksimal 5MB
                 {profileImage && (
                   <>
                     <br />
-                    <span className="text-green-600">✓ Gambar berhasil dimuat</span>
+                    <span className="text-green-400">✓ Gambar berhasil dimuat</span>
                   </>
                 )}
               </p>
@@ -240,12 +283,12 @@ export default function AccountPage() {
 
             {/* Personal Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="text-lg font-medium text-white">
                 Informasi Pribadi
               </h3>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Username
                 </label>
                 <div className="relative">
@@ -255,7 +298,7 @@ export default function AccountPage() {
                     name="username"
                     value={formData.username}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
                     placeholder="Masukkan username"
                     required
                   />
@@ -263,7 +306,24 @@ export default function AccountPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
+                  Nama Lengkap
+                </label>
+                <div className="relative">
+                  <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
+                    placeholder="Masukkan nama lengkap"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Email
                 </label>
                 <div className="relative">
@@ -273,7 +333,7 @@ export default function AccountPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
                     placeholder="Masukkan email"
                     required
                   />
@@ -283,12 +343,12 @@ export default function AccountPage() {
 
             {/* Password Change */}
             <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="text-lg font-medium text-white">
                 Ubah Password
               </h3>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Password Saat Ini
                 </label>
                 <div className="relative">
@@ -298,7 +358,7 @@ export default function AccountPage() {
                     name="currentPassword"
                     value={formData.currentPassword}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
                     placeholder="Masukkan password saat ini"
                   />
                   <button
@@ -312,7 +372,7 @@ export default function AccountPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Password Baru
                 </label>
                 <div className="relative">
@@ -322,7 +382,7 @@ export default function AccountPage() {
                     name="newPassword"
                     value={formData.newPassword}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
                     placeholder="Masukkan password baru"
                   />
                   <button
@@ -336,7 +396,7 @@ export default function AccountPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Konfirmasi Password Baru
                 </label>
                 <div className="relative">
@@ -346,7 +406,7 @@ export default function AccountPage() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
                     placeholder="Konfirmasi password baru"
                   />
                   <button

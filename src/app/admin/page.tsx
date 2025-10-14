@@ -78,7 +78,8 @@ export default function AdminPage() {
 
   const filteredUsers = users.filter((user) => {
     return user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           user.email.toLowerCase().includes(searchTerm.toLowerCase());
+           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase()));
   });
 
   const totalUsers = users.length;
@@ -234,7 +235,7 @@ export default function AdminPage() {
                       User
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Profile Image
+                      Name
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Role
@@ -258,8 +259,33 @@ export default function AdminPage() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                          <div className="flex-shrink-0 mr-3">
+                            {user.profile_image ? (
+                              <>
+                                <img
+                                  src={user.profile_image}
+                                  alt={`${user.username} profile`}
+                                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.parentElement?.querySelector('.fallback-avatar') as HTMLElement;
+                                    if (fallback) {
+                                      fallback.style.display = 'flex';
+                                    }
+                                  }}
+                                />
+                                <div className="fallback-avatar h-10 w-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm absolute top-0 left-0" style={{ display: 'none' }}>
+                                  <User className="h-5 w-5 text-white" />
+                                </div>
+                              </>
+                            ) : (
+                              <div className="h-10 w-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
+                                <User className="h-5 w-5 text-white" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-gray-900 truncate">
                               {user.username}
                               {user.id === currentUser?.id && (
                                 <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -267,39 +293,15 @@ export default function AdminPage() {
                                 </span>
                               )}
                             </div>
-                            <div className="text-sm text-gray-500 flex items-center">
-                              <Mail className="h-3 w-3 mr-1" />
+                            <div className="text-sm text-gray-500 flex items-center truncate">
+                              <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
                               {user.email}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center relative">
-                          {user.profile_image ? (
-                            <>
-                              <img
-                                src={user.profile_image}
-                                alt={`${user.username} profile`}
-                                className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                  const fallback = e.currentTarget.parentElement?.querySelector('.fallback-avatar') as HTMLElement;
-                                  if (fallback) {
-                                    fallback.style.display = 'flex';
-                                  }
-                                }}
-                              />
-                              <div className="fallback-avatar h-16 w-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm absolute" style={{ display: 'none' }}>
-                                <User className="h-8 w-8 text-white" />
-                              </div>
-                            </>
-                          ) : (
-                            <div className="h-16 w-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
-                              <User className="h-8 w-8 text-white" />
-                            </div>
-                          )}
-                        </div>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {user.name || '-'}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -318,14 +320,16 @@ export default function AdminPage() {
                         <div className="flex items-center justify-end space-x-2">
                           <button 
                             onClick={() => handleEdit(user)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 hover:scale-105"
+                            title="Edit User"
                           >
                             <Edit size={16} />
                           </button>
                           {user.id !== currentUser?.id && (
                             <button
                               onClick={() => handleDelete(user.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-105"
+                              title="Delete User"
                             >
                               <Trash2 size={16} />
                             </button>

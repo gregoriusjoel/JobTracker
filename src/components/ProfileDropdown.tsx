@@ -57,7 +57,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
           {user?.profile_image ? (
             <img
               src={user.profile_image}
-              alt={`${user.username} profile`}
+              alt={`${user?.name || user?.username} profile`}
               className="w-8 h-8 rounded-full object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -69,7 +69,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
             />
           ) : null}
           <div className={`profile-fallback w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-medium ${user?.profile_image ? 'hidden' : ''}`}>
-            {getInitials(user?.username || 'User')}
+            {getInitials(user?.name || user?.username || 'User')}
           </div>
         </div>
         
@@ -97,7 +97,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
                     <>
                       <img
                         src={user.profile_image}
-                        alt={`${user.username} profile`}
+                        alt={`${user?.name || user?.username} profile`}
                         className="w-12 h-12 rounded-full object-cover"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -108,18 +108,18 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
                         }}
                       />
                       <div className="profile-fallback-large w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-lg font-medium absolute top-0 left-0" style={{ display: 'none' }}>
-                        {getInitials(user?.username || 'User')}
+                        {getInitials(user?.name || user?.username || 'User')}
                       </div>
                     </>
                   ) : (
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-lg font-medium">
-                      {getInitials(user?.username || 'User')}
+                      {getInitials(user?.name || user?.username || 'User')}
                     </div>
                   )}
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {user?.username || 'User'}
+                    {user?.name || user?.username || 'User'}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
                     {user?.role || 'User'} Role

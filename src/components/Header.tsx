@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
           {/* Desktop User Menu */}
           <div className="hidden sm:flex items-center space-x-4">
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              <span className="font-semibold">{user?.username}</span>
+              <span className="font-semibold">{user?.name || user?.username}</span>
             </span>
             
             {/* Profile Dropdown */}
@@ -79,7 +79,7 @@ export const Header: React.FC = () => {
                   <User className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{user?.username}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{user?.name || user?.username}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
                 </div>
               </div>

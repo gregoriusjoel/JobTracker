@@ -350,7 +350,7 @@ export default function DashboardContent() {
 
       {/* Welcome Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
               <motion.div
@@ -359,7 +359,7 @@ export default function DashboardContent() {
                 className="mb-2"
               >
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Welcome back, {user?.username}! <span className="text-gray-800">👋</span>
+                  Welcome back, {user?.name || user?.username}! <span className="text-gray-800">👋</span>
                 </h1>
                 <p className="text-gray-600 mt-1">
                   {new Date().getHours() < 12 
@@ -385,7 +385,7 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-full mx-auto px-6 sm:px-8 lg:px-12 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <StatsCard
@@ -491,32 +491,32 @@ export default function DashboardContent() {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="w-full">
+              <table className="w-full table-auto">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Perusahaan & Posisi
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                       Tanggal Apply
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Job Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                       Lokasi
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                       Platform
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                       Salary
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Aksi  
                     </th>
                   </tr>
@@ -537,7 +537,7 @@ export default function DashboardContent() {
                             <div className="flex items-center">
                               <button
                                 onClick={() => toggleCardExpansion(app.id)}
-                                className="mr-2 p-1 rounded-md hover:bg-gray-200 transition-colors"
+                                className="mr-3 p-1 rounded-md hover:bg-gray-200 transition-colors"
                               >
                                 {isExpanded ? (
                                   <ChevronUp size={16} className="text-gray-400" />
@@ -545,44 +545,44 @@ export default function DashboardContent() {
                                   <ChevronDown size={16} className="text-gray-400" />
                                 )}
                               </button>
-                              <Building2 size={16} className="text-gray-400 mr-2" />
+                              <Building2 size={20} className="text-blue-500 mr-3" />
                               <div>
                                 <div className="font-medium text-gray-900">{app.company_name}</div>
                                 <div className="text-sm text-gray-600 mt-1">{app.position}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-4">
                             <StatusBadge status={app.status} />
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-4 hidden sm:table-cell">
                             <div className="flex items-center text-sm text-gray-900">
-                              <Calendar size={16} className="text-gray-400 mr-2" />
+                              <Calendar size={16} className="text-green-500 mr-2" />
                               {formatDate(app.application_date)}
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-4">
                             <JobTypeBadge jobType={app.job_type} />
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-4 hidden md:table-cell">
                             <div className="flex items-center text-sm text-gray-900">
-                              <MapPin size={16} className="text-gray-400 mr-2" />
+                              <MapPin size={16} className="text-red-500 mr-2" />
                               {app.location || '-'}
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-4 hidden lg:table-cell">
                             <div className="flex items-center text-sm text-gray-900">
-                              <Globe size={16} className="text-gray-400 mr-2" />
+                              <Globe size={16} className="text-purple-500 mr-2" />
                               {app.application_platform || '-'}
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-4 hidden lg:table-cell">
                             <div className="flex items-center text-sm text-gray-900">
-                              <Banknote size={16} className="text-gray-400 mr-2" />
+                              <Banknote size={16} className="text-yellow-500 mr-2" />
                               {formatCurrency(app.salary)}
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-4 py-4 text-right">
                             <div className="flex items-center justify-end space-x-2">
                               <button 
                                 onClick={() => handleEdit(app)}
@@ -624,45 +624,57 @@ export default function DashboardContent() {
                                       {/* Basic Info Grid */}
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                         {/* Company Name (redundant but complete) */}
-                                        <div className="flex items-center space-x-2">
-                                          <Building2 size={16} className="text-gray-400" />
-                                          <span className="text-sm font-medium text-gray-600">Perusahaan:</span>
-                                          <span className="text-sm text-gray-800">{app.company_name}</span>
+                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                          <Building2 size={20} className="text-blue-500" />
+                                          <div>
+                                            <span className="text-sm font-semibold text-gray-600 block">Perusahaan</span>
+                                            <span className="text-base text-gray-800 font-medium">{app.company_name}</span>
+                                          </div>
                                         </div>
                                         
                                         {/* Position (redundant but complete) */}
-                                        <div className="flex items-center space-x-2">
-                                          <User size={16} className="text-gray-400" />
-                                          <span className="text-sm font-medium text-gray-600">Posisi:</span>
-                                          <span className="text-sm text-gray-800">{app.position}</span>
+                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                          <User size={20} className="text-green-500" />
+                                          <div>
+                                            <span className="text-sm font-semibold text-gray-600 block">Posisi</span>
+                                            <span className="text-base text-gray-800 font-medium">{app.position}</span>
+                                          </div>
                                         </div>
                                         
                                         {/* Application Platform */}
-                                        <div className="flex items-center space-x-2">
-                                          <Globe size={16} className="text-gray-400" />
-                                          <span className="text-sm font-medium text-gray-600">Platform:</span>
-                                          <span className="text-sm text-gray-800">{app.application_platform || '-'}</span>
+                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                          <Globe size={20} className="text-purple-500" />
+                                          <div>
+                                            <span className="text-sm font-semibold text-gray-600 block">Platform</span>
+                                            <span className="text-base text-gray-800 font-medium">{app.application_platform || '-'}</span>
+                                          </div>
                                         </div>
                                         
                                         {/* Location */}
-                                        <div className="flex items-center space-x-2">
-                                          <MapPin size={16} className="text-gray-400" />
-                                          <span className="text-sm font-medium text-gray-600">Lokasi:</span>
-                                          <span className="text-sm text-gray-800">{app.location || '-'}</span>
+                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                          <MapPin size={20} className="text-red-500" />
+                                          <div>
+                                            <span className="text-sm font-semibold text-gray-600 block">Lokasi</span>
+                                            <span className="text-base text-gray-800 font-medium">{app.location || '-'}</span>
+                                          </div>
                                         </div>
                                         
                                         {/* Salary */}
-                                        <div className="flex items-center space-x-2">
-                                          <Banknote size={16} className="text-gray-400" />
-                                          <span className="text-sm font-medium text-gray-600">Salary:</span>
-                                          <span className="text-sm text-gray-800">{formatCurrency(app.salary)}</span>
+                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                          <Banknote size={20} className="text-yellow-500" />
+                                          <div>
+                                            <span className="text-sm font-semibold text-gray-600 block">Salary</span>
+                                            <span className="text-base text-gray-800 font-medium">{formatCurrency(app.salary)}</span>
+                                          </div>
                                         </div>
                                         
                                         {/* Application Date */}
-                                        <div className="flex items-center space-x-2">
-                                          <Calendar size={16} className="text-gray-400" />
-                                          <span className="text-sm font-medium text-gray-600">Tanggal Apply:</span>
-                                          <span className="text-sm text-gray-800">{formatDate(app.application_date)}</span>
+                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                          <Calendar size={20} className="text-indigo-500" />
+                                          <div>
+                                            <span className="text-sm font-semibold text-gray-600 block">Tanggal Apply</span>
+                                            <span className="text-base text-gray-800 font-medium">{formatDate(app.application_date)}</span>
+                                          </div>
                                         </div>
                                         
                                         {/* Job Type */}
