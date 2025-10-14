@@ -22,14 +22,43 @@ import { userService } from '@/services/user';
 import { Header } from '@/components/Header';
 import { UserModal } from '@/components/UserModal';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function AdminPage() {
   const { user: currentUser } = useAuth();
+  const { theme } = useTheme();
   const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserType | undefined>();
+
+  // Theme-based styles
+  const isDark = theme === 'dark';
+  const bgStyle = {
+    backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+    backgroundImage: isDark 
+      ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' 
+      : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    minHeight: '100vh'
+  };
+  const cardBgStyle = {
+    backgroundColor: isDark ? '#1e293b' : '#ffffff',
+    boxShadow: isDark 
+      ? '0 10px 25px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.5)' 
+      : '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    border: 'none'
+  };
+  const headerBgStyle = {
+    backgroundColor: isDark ? '#1e293b' : '#ffffff',
+    borderBottom: `1px solid ${isDark ? '#334155' : '#e5e7eb'}`
+  };
+  const textStyle = {
+    color: isDark ? '#f8fafc' : '#111827'
+  };
+  const secondaryTextStyle = {
+    color: isDark ? '#cbd5e1' : '#6b7280'
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -95,11 +124,11 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={bgStyle}>
       <Header />
 
       {/* Welcome Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div style={headerBgStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center">
@@ -109,7 +138,18 @@ export default function AdminPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="mr-4 p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
+                  className="mr-4 p-2 rounded-lg transition-all duration-200"
+                  style={{
+                    color: isDark ? '#cbd5e1' : '#6b7280'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#a855f7';
+                    e.currentTarget.style.backgroundColor = isDark ? '#2d1b69' : '#f3e8ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = isDark ? '#cbd5e1' : '#6b7280';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
                   <ArrowLeft size={20} />
                 </motion.button>
@@ -120,9 +160,9 @@ export default function AdminPage() {
                 className="mb-2"
               >
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                  User Management<span className="text-gray-800">🛡️</span>
+                  User Management<span style={textStyle}>🛡️</span>
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p style={secondaryTextStyle} className="mt-1">
                   Manage system users and their permissions
                 </p>
               </motion.div>
@@ -149,14 +189,20 @@ export default function AdminPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-6 shadow-lg border border-blue-200"
+            className="rounded-xl p-6 shadow-lg"
+            style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%)'
+                : 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+              border: 'none'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-700 text-sm font-medium">Total Users</p>
-                <p className="text-blue-900 text-2xl font-bold mt-1">{totalUsers}</p>
+                <p className={`text-sm font-medium ${isDark ? 'text-blue-200' : 'text-blue-700'}`}>Total Users</p>
+                <p className={`text-2xl font-bold mt-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>{totalUsers}</p>
               </div>
-              <Users className="text-blue-600 opacity-80" size={24} />
+              <Users className={`opacity-80 ${isDark ? 'text-blue-300' : 'text-blue-600'}`} size={24} />
             </div>
           </motion.div>
 
@@ -165,14 +211,20 @@ export default function AdminPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-lg border border-purple-200"
+            className="rounded-xl p-6 shadow-lg"
+            style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, #7c2d12 0%, #a21caf 100%)'
+                : 'linear-gradient(135deg, #fdf4ff 0%, #f3e8ff 100%)',
+              border: 'none'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-700 text-sm font-medium">Admins</p>
-                <p className="text-purple-900 text-2xl font-bold mt-1">{adminUsers}</p>
+                <p className={`text-sm font-medium ${isDark ? 'text-purple-200' : 'text-purple-700'}`}>Admins</p>
+                <p className={`text-2xl font-bold mt-1 ${isDark ? 'text-white' : 'text-purple-900'}`}>{adminUsers}</p>
               </div>
-              <UserCheck className="text-purple-600 opacity-80" size={24} />
+              <UserCheck className={`opacity-80 ${isDark ? 'text-purple-300' : 'text-purple-600'}`} size={24} />
             </div>
           </motion.div>
 
@@ -181,46 +233,57 @@ export default function AdminPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-lg border border-green-200"
+            className="rounded-xl p-6 shadow-lg"
+            style={{
+              background: isDark 
+                ? 'linear-gradient(135deg, #14532d 0%, #166534 100%)'
+                : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              border: 'none'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-700 text-sm font-medium">Regular Users</p>
-                <p className="text-green-900 text-2xl font-bold mt-1">{regularUsers}</p>
+                <p className={`text-sm font-medium ${isDark ? 'text-green-200' : 'text-green-700'}`}>Regular Users</p>
+                <p className={`text-2xl font-bold mt-1 ${isDark ? 'text-white' : 'text-green-900'}`}>{regularUsers}</p>
               </div>
-              <UserX className="text-green-600 opacity-80" size={24} />
+              <UserX className={`opacity-80 ${isDark ? 'text-green-300' : 'text-green-600'}`} size={24} />
             </div>
           </motion.div>
         </div>
 
         {/* Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="rounded-xl shadow-sm p-6 mb-6" style={cardBgStyle}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDark ? 'text-slate-400' : 'text-gray-400'}`} size={20} />
             <input
               type="text"
               placeholder="Search users by username or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-500"
+              style={{
+                backgroundColor: isDark ? '#334155' : '#ffffff',
+                color: isDark ? '#f8fafc' : '#111827',
+                border: `1px solid ${isDark ? '#475569' : '#d1d5db'}`
+              }}
             />
           </div>
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="rounded-xl shadow-sm overflow-hidden" style={cardBgStyle}>
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your search or add new users</p>
+              <Users className={`mx-auto h-12 w-12 mb-4 ${isDark ? 'text-slate-400' : 'text-gray-400'}`} />
+              <h3 className="text-lg font-medium mb-2" style={textStyle}>No users found</h3>
+              <p style={{color: isDark ? '#cbd5e1' : '#6b7280'}} className="mb-4">Try adjusting your search or add new users</p>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+                className="inline-flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
               >
                 <Plus size={20} className="mr-2" />
                 Add User
@@ -229,33 +292,52 @@ export default function AdminPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead style={{
+                  backgroundColor: isDark ? '#334155' : '#f9fafb'
+                }}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{color: isDark ? '#cbd5e1' : '#6b7280'}}>
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{color: isDark ? '#cbd5e1' : '#6b7280'}}>
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{color: isDark ? '#cbd5e1' : '#6b7280'}}>
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{color: isDark ? '#cbd5e1' : '#6b7280'}}>
                       Created At
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider"
+                        style={{color: isDark ? '#cbd5e1' : '#6b7280'}}>
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody style={{
+                  backgroundColor: isDark ? '#1e293b' : '#ffffff'
+                }}>
                   {filteredUsers.map((user, index) => (
                     <motion.tr
                       key={user.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="hover:bg-gray-50"
+                      style={{
+                        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                        borderBottom: `1px solid ${isDark ? '#334155' : '#e5e7eb'}`
+                      }}
+                      className="transition-colors duration-200"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#f9fafb';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = isDark ? '#1e293b' : '#ffffff';
+                      }}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
@@ -285,7 +367,7 @@ export default function AdminPage() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-gray-900 truncate">
+                            <div className="text-sm font-medium truncate" style={textStyle}>
                               {user.username}
                               {user.id === currentUser?.id && (
                                 <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -293,14 +375,14 @@ export default function AdminPage() {
                                 </span>
                               )}
                             </div>
-                            <div className="text-sm text-gray-500 flex items-center truncate">
+                            <div className="text-sm flex items-center truncate" style={{color: isDark ? '#cbd5e1' : '#6b7280'}}>
                               <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
                               {user.email}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm" style={textStyle}>
                         {user.name || '-'}
                       </td>
                       <td className="px-6 py-4">
@@ -313,23 +395,45 @@ export default function AdminPage() {
                           {user.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm" style={textStyle}>
                         {formatDate(user.created_at)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end space-x-2">
                           <button 
                             onClick={() => handleEdit(user)}
-                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 hover:scale-105"
+                            className="p-2 text-purple-600 rounded-lg transition-all duration-200"
                             title="Edit User"
+                            style={{
+                              backgroundColor: 'transparent'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = isDark ? '#2d1b69' : '#f3e8ff';
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
                           >
                             <Edit size={16} />
                           </button>
                           {user.id !== currentUser?.id && (
                             <button
                               onClick={() => handleDelete(user.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-105"
+                              className="p-2 text-red-600 rounded-lg transition-all duration-200"
                               title="Delete User"
+                              style={{
+                                backgroundColor: 'transparent'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = isDark ? '#7f1d1d' : '#fee2e2';
+                                e.currentTarget.style.transform = 'scale(1.05)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
                             >
                               <Trash2 size={16} />
                             </button>

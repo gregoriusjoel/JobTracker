@@ -151,7 +151,20 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
               )}
 
               <button
-                onClick={() => toggleTheme()}
+                onClick={() => {
+                  console.log('=== THEME TOGGLE CLICKED ===');
+                  console.log('Current theme state:', theme);
+                  console.log('Current DOM classes:', document.documentElement.className);
+                  
+                  toggleTheme();
+                  setIsOpen(false);
+                  
+                  setTimeout(() => {
+                    console.log('After toggle:');
+                    console.log('DOM classes:', document.documentElement.className);
+                    console.log('LocalStorage:', localStorage.getItem('job-tracker-theme'));
+                  }, 100);
+                }}
                 className="flex items-center w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 {theme === 'dark' ? (

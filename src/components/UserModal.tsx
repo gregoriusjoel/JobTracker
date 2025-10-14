@@ -7,6 +7,7 @@ import { X, User, Mail, Key, Shield, Camera, Edit, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { User as UserType } from '@/types';
 import { CreateUserRequest, UpdateUserRequest, userService } from '@/services/user';
+import { useTheme } from '@/context/ThemeContext';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -30,11 +31,32 @@ export const UserModal: React.FC<UserModalProps> = ({
   onSuccess,
   user
 }) => {
+  const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!user;
+
+  // Theme-based styles
+  const isDark = theme === 'dark';
+  const modalBgStyle = {
+    backgroundColor: isDark ? '#1f2937' : '#ffffff'
+  };
+  const headerBgStyle = {
+    background: isDark 
+      ? 'linear-gradient(to right, #374151, #4b5563)' 
+      : 'linear-gradient(to right, #faf5ff, #f0f9ff)',
+    borderBottom: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+  };
+  const textStyle = {
+    color: isDark ? '#f9fafb' : '#111827'
+  };
+  const inputStyle = {
+    backgroundColor: isDark ? '#374151' : '#ffffff',
+    color: isDark ? '#f9fafb' : '#111827',
+    border: `1px solid ${isDark ? '#4b5563' : '#d1d5db'}`
+  };
 
   const compressImage = (file: File, maxWidth: number = 400, maxHeight: number = 400, quality: number = 0.7): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -199,11 +221,12 @@ export const UserModal: React.FC<UserModalProps> = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col"
+            className="rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col"
+            style={modalBgStyle}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50 flex-shrink-0 rounded-t-xl">
+            <div className="flex items-center justify-between p-5 flex-shrink-0 rounded-t-xl" style={headerBgStyle}>
               <div className="flex items-center space-x-3">
                 {isEditing ? (
                   <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
@@ -215,19 +238,30 @@ export const UserModal: React.FC<UserModalProps> = ({
                   </div>
                 )}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold" style={textStyle}>
                     {isEditing ? 'Edit User' : 'Add New User'}
                   </h2>
                   {isEditing && user && (
-                    <p className="text-sm text-gray-600">Editing: {user.username}</p>
+                    <p className="text-sm" style={{color: isDark ? '#d1d5db' : '#6b7280'}}>Editing: {user.username}</p>
                   )}
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all duration-200"
+                className="p-2 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#ffffff';
+                  e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} style={{color: isDark ? '#9ca3af' : '#6b7280'}} />
               </button>
             </div>
 
@@ -235,14 +269,15 @@ export const UserModal: React.FC<UserModalProps> = ({
             <form id="user-form" onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{color: isDark ? '#d1d5db' : '#374151'}}>
                   <User size={16} className="inline mr-2" />
                   Username *
                 </label>
                 <input
                   {...register('username', { required: 'Username wajib diisi' })}
                   type="text"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
+                  className="w-full px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder-gray-500 transition-all duration-200"
+                  style={inputStyle}
                   placeholder="Enter username"
                 />
                 {errors.username && (
@@ -251,14 +286,15 @@ export const UserModal: React.FC<UserModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{color: isDark ? '#d1d5db' : '#374151'}}>
                   <User size={16} className="inline mr-2" />
                   Full Name
                 </label>
                 <input
                   {...register('name')}
                   type="text"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
+                  className="w-full px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder-gray-500 transition-all duration-200"
+                  style={inputStyle}
                   placeholder="Enter full name"
                 />
                 {errors.name && (
@@ -267,7 +303,7 @@ export const UserModal: React.FC<UserModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{color: isDark ? '#d1d5db' : '#374151'}}>
                   <Mail size={16} className="inline mr-2" />
                   Email *
                 </label>
@@ -280,7 +316,8 @@ export const UserModal: React.FC<UserModalProps> = ({
                     }
                   })}
                   type="email"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:border-gray-400"
+                  className="w-full px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder-gray-500 transition-all duration-200"
+                  style={inputStyle}
                   placeholder="Enter email"
                 />
                 {errors.email && (

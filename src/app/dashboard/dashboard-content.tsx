@@ -31,6 +31,7 @@ import { jobApplicationService } from '@/services/jobApplication';
 import { Header } from '@/components/Header';
 import { JobApplicationModal } from '@/components/JobApplicationModal';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 
 interface StatsCardProps {
   title: string;
@@ -55,20 +56,29 @@ const StatsCard: React.FC<StatsCardProps> = ({
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     whileHover={{ scale: 1.02 }}
-    className={`${bgColor} rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden`}
+    className="rounded-xl p-6 relative overflow-hidden"
+    style={{
+      backgroundColor: bgColor.includes('blue') ? '#dbeafe' : 
+                       bgColor.includes('yellow') ? '#fef3c7' :
+                       bgColor.includes('orange') ? '#fed7aa' :
+                       bgColor.includes('red') ? '#fecaca' :
+                       bgColor.includes('green') ? '#dcfce7' : '#f3f4f6',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      border: 'none'
+    }}
   >
     <div className="flex items-center justify-between">
       <div className="flex-1">
-        <p className="text-gray-600 text-sm font-medium">{title}</p>
+        <p className="text-sm font-medium" style={{ color: '#6b7280' }}>{title}</p>
         {loading ? (
           <div className="mt-1">
-            <div className="animate-pulse bg-gray-300 h-8 w-16 rounded"></div>
+            <div className="animate-pulse bg-gray-300 dark:bg-gray-600 h-8 w-16 rounded"></div>
           </div>
         ) : (
           <div className="flex items-end gap-2">
             <p className={`${color} text-2xl font-bold mt-1`}>{value}</p>
             {percentage !== undefined && percentage > 0 && (
-              <p className="text-gray-500 text-sm mb-1">({percentage}%)</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">({percentage}%)</p>
             )}
           </div>
         )}
@@ -194,6 +204,7 @@ const JobTypeBadge: React.FC<{ jobType?: string }> = ({ jobType }) => {
 
 export default function DashboardContent() {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
   const [stats, setStats] = useState<JobApplicationStats>({
     total: 0,
@@ -215,6 +226,31 @@ export default function DashboardContent() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<JobApplication | undefined>();
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+
+  // Theme-based styles
+  const isDark = theme === 'dark';
+  const bgStyle = {
+    backgroundColor: isDark ? '#111827' : '#f8fafc',
+    backgroundImage: isDark 
+      ? 'linear-gradient(135deg, #111827 0%, #1f2937 100%)' 
+      : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    minHeight: '100vh'
+  };
+  const cardBgStyle = {
+    backgroundColor: isDark ? '#1f2937' : '#ffffff',
+    boxShadow: isDark 
+      ? '0 10px 25px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)' 
+      : '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+  };
+  const textStyle = {
+    color: isDark ? '#f9fafb' : '#111827'
+  };
+  const tableBgStyle = {
+    backgroundColor: isDark ? '#1f2937' : '#ffffff'
+  };
+  const tableRowBgStyle = {
+    backgroundColor: isDark ? '#374151' : '#ffffff'
+  };
 
   useEffect(() => {
     // Auto reject old applications first, then fetch current data
@@ -345,11 +381,14 @@ export default function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={bgStyle}>
       <Header />
 
       {/* Welcome Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="shadow-sm" style={{
+        ...cardBgStyle,
+        borderBottom: isDark ? '1px solid #374151' : '1px solid #e5e7eb'
+      }}>
         <div className="max-w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -359,9 +398,9 @@ export default function DashboardContent() {
                 className="mb-2"
               >
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Welcome back, {user?.name || user?.username}! <span className="text-gray-800">👋</span>
+                  Welcome back, {user?.name || user?.username}! <span style={textStyle}>👋</span>
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="mt-1" style={textStyle}>
                   {new Date().getHours() < 12 
                     ? 'Good morning! Ready to track your job applications?' 
                     : new Date().getHours() < 18 
@@ -435,7 +474,10 @@ export default function DashboardContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="rounded-xl p-6 mb-6" style={{
+          ...cardBgStyle,
+          border: 'none'
+        }}>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -445,7 +487,15 @@ export default function DashboardContent() {
                   placeholder="Cari berdasarkan perusahaan atau posisi..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200"
+                  style={{
+                    backgroundColor: isDark ? '#374151' : '#ffffff',
+                    color: isDark ? '#f9fafb' : '#111827',
+                    border: isDark ? '1px solid #4b5563' : '1px solid #d1d5db',
+                    boxShadow: isDark 
+                      ? '0 1px 3px 0 rgba(0, 0, 0, 0.3)' 
+                      : '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                  }}
                 />
               </div>
             </div>
@@ -453,7 +503,15 @@ export default function DashboardContent() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all duration-200"
+                style={{
+                  backgroundColor: isDark ? '#374151' : '#ffffff',
+                  color: isDark ? '#f9fafb' : '#111827',
+                  border: isDark ? '1px solid #4b5563' : '1px solid #d1d5db',
+                  boxShadow: isDark 
+                    ? '0 1px 3px 0 rgba(0, 0, 0, 0.3)' 
+                    : '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                }}
               >
                 <option value="">Semua Status</option>
                 <option value="applied">Applied</option>
@@ -472,7 +530,10 @@ export default function DashboardContent() {
         </div>
 
         {/* Job Applications Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="rounded-xl overflow-hidden" style={{
+          ...cardBgStyle,
+          border: 'none'
+        }}>
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -493,35 +554,43 @@ export default function DashboardContent() {
           ) : (
             <div className="w-full">
               <table className="w-full table-auto">
-                <thead className="bg-gray-50">
+                <thead 
+                  className="rounded-t-xl"
+                  style={{ 
+                    backgroundColor: isDark ? '#374151' : '#f8fafc',
+                    borderBottom: isDark ? '1px solid #4b5563' : '1px solid #e2e8f0'
+                  }}
+                >
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Perusahaan & Posisi
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Status
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                    <th className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden sm:table-cell" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Tanggal Apply
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Job Type
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    <th className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden md:table-cell" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Lokasi
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                    <th className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden lg:table-cell" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Platform
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                    <th className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wider hidden lg:table-cell" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Salary
                     </th>
-                    <th className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-right text-xs font-medium uppercase tracking-wider" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
                       Aksi  
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody style={{
+                  backgroundColor: isDark ? '#1f2937' : '#ffffff'
+                }}>
                   {filteredApplications.map((app, index) => {
                     const isExpanded = expandedCards.has(app.id);
                     return (
@@ -531,13 +600,32 @@ export default function DashboardContent() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="hover:bg-gray-50"
+                          style={{
+                            backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                            borderBottom: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                          }}
+                          className="transition-colors duration-200"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f9fafb';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isDark ? '#1f2937' : '#ffffff';
+                          }}
                         >
                           <td className="px-6 py-4">
                             <div className="flex items-center">
                               <button
                                 onClick={() => toggleCardExpansion(app.id)}
-                                className="mr-3 p-1 rounded-md hover:bg-gray-200 transition-colors"
+                                className="mr-3 p-1 rounded-md transition-colors"
+                                style={{
+                                  backgroundColor: 'transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
                               >
                                 {isExpanded ? (
                                   <ChevronUp size={16} className="text-gray-400" />
@@ -547,8 +635,8 @@ export default function DashboardContent() {
                               </button>
                               <Building2 size={20} className="text-blue-500 mr-3" />
                               <div>
-                                <div className="font-medium text-gray-900">{app.company_name}</div>
-                                <div className="text-sm text-gray-600 mt-1">{app.position}</div>
+                                <div className="font-medium" style={{color: isDark ? '#f9fafb' : '#111827'}}>{app.company_name}</div>
+                                <div className="text-sm mt-1" style={{color: isDark ? '#d1d5db' : '#6b7280'}}>{app.position}</div>
                               </div>
                             </div>
                           </td>
@@ -556,7 +644,7 @@ export default function DashboardContent() {
                             <StatusBadge status={app.status} />
                           </td>
                           <td className="px-4 py-4 hidden sm:table-cell">
-                            <div className="flex items-center text-sm text-gray-900">
+                            <div className="flex items-center text-sm" style={{color: isDark ? '#f9fafb' : '#111827'}}>
                               <Calendar size={16} className="text-green-500 mr-2" />
                               {formatDate(app.application_date)}
                             </div>
@@ -565,19 +653,19 @@ export default function DashboardContent() {
                             <JobTypeBadge jobType={app.job_type} />
                           </td>
                           <td className="px-4 py-4 hidden md:table-cell">
-                            <div className="flex items-center text-sm text-gray-900">
+                            <div className="flex items-center text-sm" style={{color: isDark ? '#f9fafb' : '#111827'}}>
                               <MapPin size={16} className="text-red-500 mr-2" />
                               {app.location || '-'}
                             </div>
                           </td>
                           <td className="px-4 py-4 hidden lg:table-cell">
-                            <div className="flex items-center text-sm text-gray-900">
+                            <div className="flex items-center text-sm" style={{color: isDark ? '#f9fafb' : '#111827'}}>
                               <Globe size={16} className="text-purple-500 mr-2" />
                               {app.application_platform || '-'}
                             </div>
                           </td>
                           <td className="px-4 py-4 hidden lg:table-cell">
-                            <div className="flex items-center text-sm text-gray-900">
+                            <div className="flex items-center text-sm" style={{color: isDark ? '#f9fafb' : '#111827'}}>
                               <Banknote size={16} className="text-yellow-500 mr-2" />
                               {formatCurrency(app.salary)}
                             </div>
@@ -586,13 +674,31 @@ export default function DashboardContent() {
                             <div className="flex items-center justify-end space-x-2">
                               <button 
                                 onClick={() => handleEdit(app)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-2 text-blue-600 rounded-lg transition-colors"
+                                style={{
+                                  backgroundColor: 'transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = isDark ? '#1e40af' : '#dbeafe';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
                               >
                                 <Edit size={16} />
                               </button>
                               <button
                                 onClick={() => handleDelete(app.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-red-600 rounded-lg transition-colors"
+                                style={{
+                                  backgroundColor: 'transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = isDark ? '#dc2626' : '#fecaca';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -617,63 +723,103 @@ export default function DashboardContent() {
                                   transition={{ duration: 0.3 }}
                                   className="overflow-hidden"
                                 >
-                                  <div className="py-4 bg-gray-50 rounded-lg mx-2 mb-2">
+                                  <div className="py-4 rounded-lg mx-2 mb-2" style={{
+                                    backgroundColor: isDark ? '#374151' : '#f9fafb'
+                                  }}>
                                     <div className="px-4">
-                                      <h4 className="text-sm font-semibold text-gray-800 mb-3">Detail Lengkap</h4>
+                                      <h4 className="text-sm font-semibold mb-3" style={{
+                                        color: isDark ? '#f9fafb' : '#1f2937'
+                                      }}>Detail Lengkap</h4>
                                       
                                       {/* Basic Info Grid */}
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                         {/* Company Name (redundant but complete) */}
-                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl" style={{
+                                          backgroundColor: isDark ? '#1f2937' : 'rgba(255, 255, 255, 0.7)'
+                                        }}>
                                           <Building2 size={20} className="text-blue-500" />
                                           <div>
-                                            <span className="text-sm font-semibold text-gray-600 block">Perusahaan</span>
-                                            <span className="text-base text-gray-800 font-medium">{app.company_name}</span>
+                                            <span className="text-sm font-semibold block" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Perusahaan</span>
+                                            <span className="text-base font-medium" style={{
+                                              color: isDark ? '#f9fafb' : '#1f2937'
+                                            }}>{app.company_name}</span>
                                           </div>
                                         </div>
                                         
                                         {/* Position (redundant but complete) */}
-                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl" style={{
+                                          backgroundColor: isDark ? '#1f2937' : 'rgba(255, 255, 255, 0.7)'
+                                        }}>
                                           <User size={20} className="text-green-500" />
                                           <div>
-                                            <span className="text-sm font-semibold text-gray-600 block">Posisi</span>
-                                            <span className="text-base text-gray-800 font-medium">{app.position}</span>
+                                            <span className="text-sm font-semibold block" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Posisi</span>
+                                            <span className="text-base font-medium" style={{
+                                              color: isDark ? '#f9fafb' : '#1f2937'
+                                            }}>{app.position}</span>
                                           </div>
                                         </div>
                                         
                                         {/* Application Platform */}
-                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl" style={{
+                                          backgroundColor: isDark ? '#1f2937' : 'rgba(255, 255, 255, 0.7)'
+                                        }}>
                                           <Globe size={20} className="text-purple-500" />
                                           <div>
-                                            <span className="text-sm font-semibold text-gray-600 block">Platform</span>
-                                            <span className="text-base text-gray-800 font-medium">{app.application_platform || '-'}</span>
+                                            <span className="text-sm font-semibold block" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Platform</span>
+                                            <span className="text-base font-medium" style={{
+                                              color: isDark ? '#f9fafb' : '#1f2937'
+                                            }}>{app.application_platform || '-'}</span>
                                           </div>
                                         </div>
                                         
                                         {/* Location */}
-                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl" style={{
+                                          backgroundColor: isDark ? '#1f2937' : 'rgba(255, 255, 255, 0.7)'
+                                        }}>
                                           <MapPin size={20} className="text-red-500" />
                                           <div>
-                                            <span className="text-sm font-semibold text-gray-600 block">Lokasi</span>
-                                            <span className="text-base text-gray-800 font-medium">{app.location || '-'}</span>
+                                            <span className="text-sm font-semibold block" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Lokasi</span>
+                                            <span className="text-base font-medium" style={{
+                                              color: isDark ? '#f9fafb' : '#1f2937'
+                                            }}>{app.location || '-'}</span>
                                           </div>
                                         </div>
                                         
                                         {/* Salary */}
-                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl" style={{
+                                          backgroundColor: isDark ? '#1f2937' : 'rgba(255, 255, 255, 0.7)'
+                                        }}>
                                           <Banknote size={20} className="text-yellow-500" />
                                           <div>
-                                            <span className="text-sm font-semibold text-gray-600 block">Salary</span>
-                                            <span className="text-base text-gray-800 font-medium">{formatCurrency(app.salary)}</span>
+                                            <span className="text-sm font-semibold block" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Salary</span>
+                                            <span className="text-base font-medium" style={{
+                                              color: isDark ? '#f9fafb' : '#1f2937'
+                                            }}>{formatCurrency(app.salary)}</span>
                                           </div>
                                         </div>
                                         
                                         {/* Application Date */}
-                                        <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-xl">
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl" style={{
+                                          backgroundColor: isDark ? '#1f2937' : 'rgba(255, 255, 255, 0.7)'
+                                        }}>
                                           <Calendar size={20} className="text-indigo-500" />
                                           <div>
-                                            <span className="text-sm font-semibold text-gray-600 block">Tanggal Apply</span>
-                                            <span className="text-base text-gray-800 font-medium">{formatDate(app.application_date)}</span>
+                                            <span className="text-sm font-semibold block" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Tanggal Apply</span>
+                                            <span className="text-base font-medium" style={{
+                                              color: isDark ? '#f9fafb' : '#1f2937'
+                                            }}>{formatDate(app.application_date)}</span>
                                           </div>
                                         </div>
                                         
@@ -681,7 +827,9 @@ export default function DashboardContent() {
                                         {app.job_type && (
                                           <div className="flex items-center space-x-2">
                                             <Briefcase size={16} className="text-gray-400" />
-                                            <span className="text-sm font-medium text-gray-600">Job Type:</span>
+                                            <span className="text-sm font-medium" style={{
+                                              color: isDark ? '#d1d5db' : '#6b7280'
+                                            }}>Job Type:</span>
                                             <JobTypeBadge jobType={app.job_type} />
                                           </div>
                                         )}
