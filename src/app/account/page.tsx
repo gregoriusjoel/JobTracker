@@ -305,7 +305,8 @@ export default function AccountPage() {
                     name="username"
                     value={formData.username}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
+                    placeholder="Masukkan username"
                   />
                 </div>
               </div>
