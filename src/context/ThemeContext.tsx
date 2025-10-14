@@ -57,11 +57,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setMounted(true);
     
     if (typeof window !== 'undefined') {
-      // Get theme from localStorage or system preference
+      // Get theme from localStorage, default to light if not saved
       const savedTheme = localStorage.getItem('job-tracker-theme') as Theme;
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       
-      const initialTheme = savedTheme || systemTheme;
+      const initialTheme = savedTheme || 'light'; // Always default to light
       console.log('Initial theme:', initialTheme);
       setThemeState(initialTheme);
       applyTheme(initialTheme);
