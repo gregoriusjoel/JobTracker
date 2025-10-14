@@ -160,7 +160,7 @@ export default function AccountPage() {
       }
 
       // Call API to update profile
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, string> = {
         username: formData.username,
         name: formData.name,
         email: formData.email
