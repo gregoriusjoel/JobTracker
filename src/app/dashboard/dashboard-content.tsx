@@ -245,12 +245,6 @@ export default function DashboardContent() {
   const textStyle = {
     color: isDark ? '#f9fafb' : '#111827'
   };
-  const tableBgStyle = {
-    backgroundColor: isDark ? '#1f2937' : '#ffffff'
-  };
-  const tableRowBgStyle = {
-    backgroundColor: isDark ? '#374151' : '#ffffff'
-  };
 
   useEffect(() => {
     // Auto reject old applications first, then fetch current data

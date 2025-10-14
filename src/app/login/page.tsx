@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string>('');
   const router = useRouter();
-  const { login, updateUser } = useAuth();
+  const { login } = useAuth();
 
   // Motivational messages for different times of day
   const motivationalMessages = [

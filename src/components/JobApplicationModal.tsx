@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail, Briefcase, GraduationCap, Clock, Rocket, FileCheck, Globe, RefreshCw } from 'lucide-react';
+import { X, Building2, User, Calendar, MapPin, Banknote, FileText, Mail, Briefcase } from 'lucide-react';
 import { JobApplication, CreateJobApplicationRequest, UpdateJobApplicationRequest } from '@/types';
 import { jobApplicationService } from '@/services/jobApplication';
 
@@ -529,7 +529,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
                         transition={{ duration: 0.2 }}
                         className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
                       >
-                        {filteredLocations.map((location, index) => (
+                        {filteredLocations.map((location) => (
                           <button
                             key={location}
                             type="button"
