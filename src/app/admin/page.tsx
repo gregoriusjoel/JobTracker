@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { 
   Plus, 
@@ -344,9 +345,11 @@ export default function AdminPage() {
                           <div className="flex-shrink-0 mr-3">
                             {user.profile_image ? (
                               <>
-                                <img
+                                <Image
                                   src={user.profile_image}
                                   alt={`${user.username} profile`}
+                                  width={40}
+                                  height={40}
                                   className="h-10 w-10 rounded-full object-cover border-2 border-gray-200 shadow-sm"
                                   onError={(e) => {
                                     e.currentTarget.style.display = 'none';

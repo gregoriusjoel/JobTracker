@@ -15,6 +15,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import Image from 'next/image';
 import { userService } from '@/services/user';
 
 export default function AccountPage() {
@@ -32,7 +33,7 @@ export default function AccountPage() {
   });
   
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  // const [imageFile, setImageFile] = useState<File | null>(null); // removed unused variable
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -66,7 +67,7 @@ export default function AccountPage() {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const img = new Image();
+      const img = document.createElement('img');
       
       img.onload = () => {
         // Calculate new dimensions
@@ -112,7 +113,7 @@ export default function AccountPage() {
       }
 
       try {
-        setImageFile(file);
+        // setImageFile(file); // removed unused variable
         const compressedBase64 = await compressImage(file);
         setProfileImage(compressedBase64);
         toast.success('Gambar berhasil dimuat dan dikompres!');
@@ -159,7 +160,7 @@ export default function AccountPage() {
       }
 
       // Call API to update profile
-      const updateData: any = {
+      const updateData: Record<string, any> = {
         username: formData.username,
         name: formData.name,
         email: formData.email
@@ -181,7 +182,7 @@ export default function AccountPage() {
       await updateUser(updatedUser);
       toast.success('Profil berhasil diperbarui!');
 
-    } catch (error) {
+    } catch {
       toast.error('Gagal memperbarui profil. Silakan coba lagi.');
     } finally {
       setIsLoading(false);
@@ -224,23 +225,29 @@ export default function AccountPage() {
             <div className="flex flex-col items-center space-y-4">
               <div className="relative">
                 {/* Current Profile Picture or Initial */}
-                {profileImage ? (
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={handleImageClick}
-                  />
-                ) : (
-                  <div 
-                    className="w-32 h-32 rounded-full flex items-center justify-center text-white text-3xl font-bold cursor-pointer hover:opacity-80 transition-opacity overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600"
-                    onClick={handleImageClick}
-                  >
-                    <span className="z-10 relative">
-                      {getInitials(formData.username || 'User')}
-                    </span>
-                  </div>
-                )}
+                  {profileImage ? (
+                    <div
+                      className="w-32 h-32 rounded-full overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={handleImageClick}
+                    >
+                      <Image
+                        src={profileImage}
+                        alt="Profile"
+                        width={128}
+                        height={128}
+                        className="w-32 h-32 rounded-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      className="w-32 h-32 rounded-full flex items-center justify-center text-white text-3xl font-bold cursor-pointer hover:opacity-80 transition-opacity overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600"
+                      onClick={handleImageClick}
+                    >
+                      <span className="z-10 relative">
+                        {getInitials(formData.username || 'User')}
+                      </span>
+                    </div>
+                  )}
                 
                 {/* Camera overlay */}
                 <div 
@@ -298,9 +305,7 @@ export default function AccountPage() {
                     name="username"
                     value={formData.username}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 !text-white"
-                    placeholder="Masukkan username"
-                    required
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
