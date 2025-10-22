@@ -3,36 +3,36 @@
 import { motion } from 'framer-motion';
 import { Heart, Code, Coffee, Github, Linkedin, Mail } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { usePathname } from 'next/navigation';
 
 export const Footer: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const pathname = usePathname();
 
   const currentYear = new Date().getFullYear();
+
+  // Determine background color based on current path
+  const getBackgroundClass = () => {
+    if (pathname === '/account') {
+      return 'bg-gray-50 dark:bg-gray-900';
+    }
+    // For all other pages, use white background even in dark mode
+    return 'bg-white dark:bg-gray-50';
+  };
 
   return (
     <motion.footer
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative mt-auto border-t"
+      className={`relative mt-auto border-t ${getBackgroundClass()}`}
       style={{
-        backgroundColor: isDark ? '#111827' : '#ffffff',
         borderColor: isDark ? '#374151' : '#e5e7eb'
       }}
     >
-      {/* Gradient overlay */}
-      <div 
-        className="absolute inset-0 opacity-50"
-        style={{
-          background: isDark 
-            ? 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)'
-            : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)'
-        }}
-      />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {/* Brand Section */}
           <div className="space-y-4">
@@ -57,33 +57,8 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Features Section */}
-          <div className="space-y-4">
-            <h4 className="font-semibold" style={{ color: isDark ? '#f9fafb' : '#111827' }}>
-              Fitur Unggulan
-            </h4>
-            <ul className="space-y-2 text-sm" style={{ color: isDark ? '#d1d5db' : '#6b7280' }}>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                <span>Pelacakan Status Lamaran Real-time</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                <span>Dashboard Analytics Komprehensif</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                <span>Multi-user & Role Management</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                <span>Dark/Light Theme Support</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact & Social */}
-          <div className="space-y-4">
+          {/* Contact & Social - Right Side with Left Alignment */}
+          <div className="space-y-4 md:ml-auto md:max-w-xs">
             <h4 className="font-semibold" style={{ color: isDark ? '#f9fafb' : '#111827' }}>
               Hubungi Developer
             </h4>
@@ -103,7 +78,7 @@ export const Footer: React.FC = () => {
                 <Github size={18} />
               </motion.a>
               <motion.a
-                href="https://linkedin.com/in/gregoriusjoel"
+                href="https://linkedin.com/in/gregorius-joel"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
@@ -117,7 +92,7 @@ export const Footer: React.FC = () => {
                 <Linkedin size={18} />
               </motion.a>
               <motion.a
-                href="mailto:gregoriusjoeldev@gmail.com"
+                href="mailto:hi.gregoriusjoel@gmail.com"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 className="p-2 rounded-lg transition-colors"
@@ -130,8 +105,8 @@ export const Footer: React.FC = () => {
               </motion.a>
             </div>
             <div className="text-xs space-y-1" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
-              <p>📧 gregoriusjoeldev@gmail.com</p>
-              <p>🌐 Jakarta, Indonesia</p>
+              <p>📧 hi.gregoriusjoel@gmail.com</p>
+              <p>🌐 Bogor, Indonesia</p>
               <p>💼 Full Stack Developer</p>
             </div>
           </div>
